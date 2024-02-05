@@ -65,6 +65,7 @@
 </template>
 
 <script>
+import { NDEFReader } from "nfc";
 import jsQR from "jsqr";
 import { QrcodeStream } from "vue-qrcode-reader";
 import cardComponent from "@/components/cardComponent.vue";
