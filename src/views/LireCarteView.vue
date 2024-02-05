@@ -184,24 +184,17 @@ export default {
             }
         },
         lireNFC() {
-            // Vérifier si "NDEFReader" est pris en charge dans le navigateur
             if ("NDEFReader" in window) {
                 const reader = new NDEFReader();
 
                 reader.scan().then(
-                    (result) => {
-                        if (result) {
-                            const { message } = result;
-                            if (message) {
-                                const decodedData = this.decoderDonneesNFC(message);
-                                this.onDecode(decodedData);
-                            } else {
-                                console.error("Aucun message trouvé lors de la lecture NFC.");
-                                this.erreurMessage = "Erreur : Aucun message trouvé lors de la lecture NFC.";
-                            }
+                    ({ message }) => {
+                        if (message) {
+                            const decodedData = this.decoderDonneesNFC(message);
+                            this.onDecode(decodedData);
                         } else {
-                            console.error("Résultat de la lecture NFC est 'undefined'.");
-                            this.erreurMessage = "Erreur : Résultat de la lecture NFC est 'undefined'.";
+                            console.error("Aucune donnée NFC trouvée.");
+                            this.erreurMessage = "Erreur : Aucune donnée NFC trouvée.";
                         }
                     },
                     (error) => {
@@ -226,26 +219,20 @@ export default {
                 }
             });
 
-            if (records.length > 0) {
-                // Retournez les données interprétées directement
-                const decodedUser = records.reduce((acc, record) => {
-                    return { ...acc, ...record };
-                }, {});
+            // Retournez les données interprétées directement
+            const decodedUser = records.reduce((acc, record) => {
+                return { ...acc, ...record };
+            }, {});
 
-                // Utilisez JSON.parse pour décoder les données JSON
-                if (decodedUser.texte) {
-                    const decodedData = JSON.parse(decodedUser.texte); // Assurez-vous d'ajuster selon votre structure
-                    this.onDecode(decodedData);
-                    this.nfcData = decodedData; // Mettez à jour nfcData avec les données décodées
-                    return decodedData;
-                } else {
-                    console.error("Aucune donnée texte trouvée dans le record NFC.");
-                    this.erreurMessage = "Erreur : Aucune donnée texte trouvée dans le record NFC.";
-                    return null;
-                }
+            // Utilisez JSON.parse pour décoder les données JSON
+            if (decodedUser.texte) {
+                const decodedData = JSON.parse(decodedUser.texte); // Assurez-vous d'ajuster selon votre structure
+                this.onDecode(decodedData);
+                this.nfcData = decodedData; // Mettez à jour nfcData avec les données décodées
+                return decodedData;
             } else {
-                console.error("Aucun record trouvé dans le message NFC.");
-                this.erreurMessage = "Erreur : Aucun record trouvé dans le message NFC.";
+                console.error("Aucune donnée texte trouvée dans le record NFC.");
+                this.erreurMessage = "Erreur : Aucune donnée texte trouvée dans le record NFC.";
                 return null;
             }
         }
