@@ -188,9 +188,9 @@ export default {
                 const reader = new NDEFReader();
 
                 reader.scan().then(
-                    ({ message }) => {
-                        if (message) {
-                            const decodedData = this.decoderDonneesNFC(message);
+                    (result) => {
+                        if (result && result.message) {
+                            const decodedData = this.decoderDonneesNFC(result.message);
                             this.onDecode(decodedData);
                         } else {
                             console.error("Aucune donnée NFC trouvée.");
