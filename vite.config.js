@@ -6,7 +6,7 @@ import vue from "@vitejs/plugin-vue";
 // https://vitejs.dev/config/
 export default defineConfig({
     //eslint-disable-next-line
-    base: process.env.NODE_ENV === "production" ? "/EzCard/" : "/",
+    base: process.env.NODE_ENV === "production" ? "/ezcard/" : "/",
     
     plugins: [vue()],
     resolve: {
