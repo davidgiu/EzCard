@@ -16,7 +16,7 @@
             </div>
 
             <div class="col col-xxl-8">
-                <!-- Colonne pour le carousel -->
+                <!-- Colonne pour le carousel df -->
                 <div class="accueil text-center">
                     <!-- Carousel -->
                     <div v-if="cartes.length > 0" class="carousel-container">
