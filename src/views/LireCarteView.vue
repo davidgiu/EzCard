@@ -1,5 +1,9 @@
 <template>
     <div class="container">
+        <div v-if="nfcData" class="nfc-data-container">
+            <h3>Données NFC lues :</h3>
+            <pre>{{ nfcData }}</pre>
+        </div>
         <div class="row">
             <div class="col-6">
                 <div class="buttons-container d-flex flex-column align-items-start" v-if="!decodedUser">
