@@ -10,6 +10,9 @@
                         <button class="btn btn-success mt-5 large-button" @click="importerQRCode">
                             Importer depuis les fichiers
                         </button>
+
+                        <!-- Bouton NFC -->
+                        <button class="btn btn-success mt-5 large-button" @click="lireNFC">Lire via NFC</button>
                     </div>
                 </div>
             </div>
@@ -126,7 +129,6 @@ export default {
             }
         },
         enregistrerCarte() {
-
             // Récupérer les cartes existantes depuis le localStorage
             const cartesExistantes = JSON.parse(localStorage.getItem("cartes")) || [];
 
@@ -174,6 +176,59 @@ export default {
                     image.src = reader.result;
                 };
                 reader.readAsDataURL(file);
+            }
+        },
+        lireNFC() {
+            if ("NDEFReader" in window) {
+                const reader = new NDEFReader();
+
+                reader.scan().then(
+                    ({ message }) => {
+                        const decodedData = this.decoderDonneesNFC(message);
+                        this.onDecode(decodedData);
+                    },
+                    (error) => {
+                        console.error("Erreur lors de la lecture NFC :", error);
+                        this.erreurMessage = "Erreur lors de la lecture NFC.";
+                    }
+                );
+            } else {
+                console.error("L'API NFC n'est pas prise en charge par votre navigateur.");
+                this.erreurMessage = "L'API NFC n'est pas prise en charge par votre navigateur.";
+            }
+        },
+
+        decoderDonneesNFC(message) {
+            const records = message.records.map((record) => {
+                switch (record.recordType) {
+                    case "text":
+                        return this.decoderTexte(record);
+                    // Ajoutez d'autres cas selon les types de données que vous attendez
+                    default:
+                        console.warn(`Type de record non pris en charge : ${record.recordType}`);
+                        return null;
+                }
+            });
+
+            // Retournez les données interprétées
+            const decodedUser = records.reduce((acc, record) => {
+                return { ...acc, ...record };
+            }, {});
+
+            this.onDecode(JSON.stringify(decodedUser));
+            return decodedUser;
+        },
+
+        decoderTexte(record) {
+            // Interprétez le record texte selon vos besoins
+            const textData = record.data;
+            console.log("Données texte lues depuis le NFC :", textData);
+
+            try {
+                return JSON.parse(textData);
+            } catch (error) {
+                console.error("Erreur lors de l'analyse JSON des données texte :", error);
+                return null;
             }
         }
     }
