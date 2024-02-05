@@ -65,8 +65,9 @@
 </template>
 
 <script>
-import { QrcodeStream } from "vue-qrcode-reader";
+import { NDEFReader } from "nfc";
 import jsQR from "jsqr";
+import { QrcodeStream } from "vue-qrcode-reader";
 import cardComponent from "@/components/cardComponent.vue";
 
 export default {
@@ -80,7 +81,8 @@ export default {
             cameraActive: false,
             validationMessage: "",
             erreurMessage: "",
-            capturing: false
+            capturing: false,
+            nfcData: null
         };
     },
     methods: {
@@ -207,31 +209,26 @@ export default {
                 switch (record.recordType) {
                     case "text":
                         return this.decoderTexte(record);
-                    // Ajoutez d'autres cas selon les types de données que vous attendez
                     default:
                         console.warn(`Type de record non pris en charge : ${record.recordType}`);
                         return null;
                 }
             });
 
-            // Retournez les données interprétées
+            // Retournez les données interprétées directement
             const decodedUser = records.reduce((acc, record) => {
                 return { ...acc, ...record };
             }, {});
 
-            this.onDecode(JSON.stringify(decodedUser));
-            return decodedUser;
-        },
-
-        decoderTexte(record) {
-            // Interprétez le record texte selon vos besoins
-            const textData = record.data;
-            console.log("Données texte lues depuis le NFC :", textData);
-
-            try {
-                return JSON.parse(textData);
-            } catch (error) {
-                console.error("Erreur lors de l'analyse JSON des données texte :", error);
+            // Utilisez JSON.parse pour décoder les données JSON
+            if (decodedUser.texte) {
+                const decodedData = JSON.parse(decodedUser.texte); // Assurez-vous d'ajuster selon votre structure
+                this.onDecode(decodedData);
+                this.nfcData = decodedData; // Mettez à jour nfcData avec les données décodées
+                return decodedData;
+            } else {
+                console.error("Aucune donnée texte trouvée dans le record NFC.");
+                this.erreurMessage = "Erreur : Aucune donnée texte trouvée dans le record NFC.";
                 return null;
             }
         }
