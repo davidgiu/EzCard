@@ -189,9 +189,20 @@ export default {
                 const reader = new NDEFReader();
 
                 reader.scan().then(
-                    ({ message }) => {
-                        const decodedData = this.decoderDonneesNFC(message);
-                        this.onDecode(decodedData);
+                    (result) => {
+                        if (result) {
+                            const { message } = result;
+                            if (message) {
+                                const decodedData = this.decoderDonneesNFC(message);
+                                this.onDecode(decodedData);
+                            } else {
+                                console.error("Aucun message trouvé lors de la lecture NFC.");
+                                this.erreurMessage = "Erreur : Aucun message trouvé lors de la lecture NFC.";
+                            }
+                        } else {
+                            console.error("Résultat de la lecture NFC est 'undefined'.");
+                            this.erreurMessage = "Erreur : Résultat de la lecture NFC est 'undefined'.";
+                        }
                     },
                     (error) => {
                         console.error("Erreur lors de la lecture NFC :", error);
