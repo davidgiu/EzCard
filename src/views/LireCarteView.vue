@@ -1,10 +1,6 @@
 <template>
     <div class="container">
         <div class="nfc-indicator" v-if="nfcDetected">NFC détecté</div>
-        <div v-if="nfcData" class="nfc-data-container">
-            <h3>Données NFC lues :</h3>
-            <pre>{{ nfcData }}</pre>
-        </div>
         <div class="row">
             <div class="col-6">
                 <div class="buttons-container d-flex flex-column align-items-start" v-if="!decodedUser">
@@ -74,7 +70,6 @@ export default {
             validationMessage: "",
             erreurMessage: "",
             capturing: false,
-            nfcData: null,
             nfcDetected: false
         };
     },
@@ -166,8 +161,7 @@ export default {
                 const reader = new NDEFReader();
                 reader.scan().then(
                     ({ records }) => {
-                        const decodedData = this.decoderDonneesNFC(records);
-                        this.onDecode(decodedData);
+                        this.decoderDonneesNFC(records);
                     },
                     (error) => {
                         console.error("Erreur lors de la lecture NFC :", error);
@@ -180,26 +174,16 @@ export default {
             }
         },
         decoderDonneesNFC(records) {
-            const decodedUser = records.reduce((acc, record) => {
+            records.forEach((record, index) => {
                 switch (record.recordType) {
                     case "text":
-                        return this.decoderTexte(record);
+                        console.log(`Record ${index + 1}: ${record.data}`);
+                        break;
                     default:
                         console.warn(`Type de record non pris en charge : ${record.recordType}`);
-                        return null;
+                        break;
                 }
-            }, {});
-
-            if (decodedUser.text) {
-                const decodedData = JSON.parse(decodedUser.text);
-                this.onDecode(decodedData);
-                this.nfcData = decodedData;
-                return decodedData;
-            } else {
-                console.error("Aucune donnée texte trouvée dans le record NFC.");
-                this.erreurMessage = "Erreur : Aucune donnée texte trouvée dans le record NFC.";
-                return null;
-            }
+            });
         },
         decoderTexte(record) {
             // Ajoutez ici votre logique pour décoder le type "text" du record NFC
