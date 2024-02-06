@@ -55,7 +55,15 @@
 </template>
 
 <script>
+import jsQR from "jsqr";
+import { QrcodeStream } from "vue-qrcode-reader";
+import cardComponent from "@/components/cardComponent.vue";
+
 export default {
+    components: {
+        QrcodeStream,
+        cardComponent
+    },
     data() {
         return {
             decodedUser: null,
