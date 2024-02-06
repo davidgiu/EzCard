@@ -186,8 +186,10 @@ export default {
             });
         },
         decoderTexte(record) {
-            // Ajoutez ici votre logique pour décoder le type "text" du record NFC
-            return { text: record.data };
+            const decoder = new TextDecoder("utf-8"); // ou "utf-16" selon le cas
+            const text = decoder.decode(record.data);
+            console.log(text);
+            return { text };
         }
     },
     mounted() {
