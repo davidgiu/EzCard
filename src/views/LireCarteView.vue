@@ -1,5 +1,6 @@
 <template>
     <div class="container">
+        <div class="nfc-indicator" v-if="nfcDetected">NFC détecté</div>
         <div v-if="nfcData" class="nfc-data-container">
             <h3>Données NFC lues :</h3>
             <pre>{{ nfcData }}</pre>
@@ -12,7 +13,9 @@
                         <button class="btn btn-success mt-5 large-button" @click="importerQRCode">
                             Importer depuis les fichiers
                         </button>
-                        <button class="btn btn-success mt-5 large-button" @click="lireNFC">Lire via NFC</button>
+                        <button class="btn btn-success mt-5 large-button" @click="lireNFC" v-if="nfcDetected">
+                            Lire via NFC
+                        </button>
                     </div>
                 </div>
             </div>
@@ -51,7 +54,7 @@
         </div>
     </div>
 
-    <div v-if="erreurMessage" class="alert alert-danger mt-3" role="alert">{{ erreurMessage }}</div>
+    <div v-if="erreurMessage" class="alert alert-danger mt-5" role="alert">{{ erreurMessage }}</div>
 </template>
 
 <script>
@@ -71,7 +74,8 @@ export default {
             validationMessage: "",
             erreurMessage: "",
             capturing: false,
-            nfcData: null
+            nfcData: null,
+            nfcDetected: false
         };
     },
     methods: {
@@ -201,6 +205,11 @@ export default {
             // Ajoutez ici votre logique pour décoder le type "text" du record NFC
             return { text: record.data };
         }
+    },
+    mounted() {
+        if ("NDEFReader" in window) {
+            this.nfcDetected = true;
+        }
     }
 };
 </script>
@@ -218,5 +227,11 @@ export default {
     height: 50px;
     width: 200px;
     margin-left: 50px;
+}
+
+.nfc-indicator {
+    font-size: 20px;
+    color: green;
+    margin-bottom: 10px;
 }
 </style>
