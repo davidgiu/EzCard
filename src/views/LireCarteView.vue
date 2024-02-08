@@ -165,6 +165,7 @@ export default {
                             console.log("Record type:  " + record.recordType);
                             console.log("MIME type:    " + record.mediaType);
                             console.log("=== data ===\n" + decoder.decode(record.data));
+                            this.decodedUser = JSON.parse(decoder.decode(record.data)); // Mise à jour de la variable decodedUser
                         }
                     };
                 } catch (error) {
@@ -174,6 +175,7 @@ export default {
                 console.error("Web NFC is not supported.");
             }
         },
+
         async writeTag() {
             if ("NDEFReader" in window) {
                 const ndef = new NDEFReader();
