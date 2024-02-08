@@ -7,9 +7,6 @@
             </button>
             <AfficheListAvatar v-if="showAvatarList" @selectAvatar="selectAvatar" />
         </div>
-        <button class="btn btn-success mt-5 large-button" @click="writeTag" v-if="modificationSuccess">
-            Écrire sur NFC
-        </button>
 
         <!-- Conteneur principal avec la disposition flex et grille Bootstrap -->
         <div class="d-lg-flex">
@@ -49,6 +46,7 @@
                 <cardComponent v-if="modificationSuccess" :user="modifiedUser" />
             </div>
         </div>
+        <button class="btn btn-success mt-5 large-button" @click="writeTag">Écrire sur NFC</button>
     </div>
 </template>
 
@@ -107,8 +105,27 @@ export default {
         }
     },
     async writeTag() {
-        console.log("writeTag");
-        console.log(this.modifiedUser);
+        if ("NDEFReader" in window) {
+            const ndef = new NDEFReader();
+            try {
+                const data = JSON.stringify({
+                    image: 1,
+                    nom: "giudice",
+                    prenom: "david",
+                    email: "david@gmail.com"
+                });
+
+                const encoder = new TextEncoder();
+                const encodedData = encoder.encode(data);
+
+                await ndef.write(encodedData);
+                console.log("NDEF message written!");
+            } catch (error) {
+                console.error(error);
+            }
+        } else {
+            console.error("Web NFC is not supported.");
+        }
     }
 };
 </script>
