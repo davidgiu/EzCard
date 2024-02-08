@@ -173,29 +173,29 @@ export default {
             } else {
                 console.error("Web NFC is not supported.");
             }
-        }
-    },
-    async writeTag() {
-        if ("NDEFReader" in window) {
-            const ndef = new NDEFReader();
-            try {
-                const data = JSON.stringify({
-                    image: 1,
-                    nom: "giudice",
-                    prenom: "david",
-                    email: "david@gmail.com"
-                });
+        },
+        async writeTag() {
+            if ("NDEFReader" in window) {
+                const ndef = new NDEFReader();
+                try {
+                    const data = JSON.stringify({
+                        image: 1,
+                        nom: "giudice",
+                        prenom: "david",
+                        email: "david@gmail.com"
+                    });
 
-                const encoder = new TextEncoder();
-                const encodedData = encoder.encode(data);
+                    const encoder = new TextEncoder();
+                    const encodedData = encoder.encode(data);
 
-                await ndef.write(encodedData);
-                console.log("NDEF message written!");
-            } catch (error) {
-                console.error(error);
+                    await ndef.write(encodedData);
+                    console.log("NDEF message written!");
+                } catch (error) {
+                    console.error(error);
+                }
+            } else {
+                console.error("Web NFC is not supported.");
             }
-        } else {
-            console.error("Web NFC is not supported.");
         }
     }
 };
