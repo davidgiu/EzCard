@@ -8,6 +8,9 @@
                         <button class="btn btn-success mt-5 large-button" @click="importerQRCode">
                             Importer depuis les fichiers
                         </button>
+                        <button class="btn btn-success mt-5 large-button" @click="writeTag" v-if="nfcDetected">
+                            Écrire sur NFC
+                        </button>
                         <button class="btn btn-success mt-5 large-button" @click="readTag">Lire via NFC</button>
                     </div>
                 </div>
@@ -172,6 +175,29 @@ export default {
             } else {
                 console.error("Web NFC is not supported.");
             }
+        }
+    },
+    async writeTag() {
+        if ("NDEFReader" in window) {
+            const ndef = new NDEFReader();
+            try {
+                const data = JSON.stringify({
+                    image: 1,
+                    nom: "giudice",
+                    prenom: "david",
+                    email: "david@gmail.com"
+                });
+
+                const encoder = new TextEncoder();
+                const encodedData = encoder.encode(data);
+
+                await ndef.write(encodedData);
+                console.log("NDEF message written!");
+            } catch (error) {
+                console.error(error);
+            }
+        } else {
+            console.error("Web NFC is not supported.");
         }
     }
 };
