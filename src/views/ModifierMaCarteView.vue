@@ -7,6 +7,9 @@
             </button>
             <AfficheListAvatar v-if="showAvatarList" @selectAvatar="selectAvatar" />
         </div>
+        <button class="btn btn-success mt-5 large-button" @click="writeTag" v-if="modificationSuccess">
+            Écrire sur NFC
+        </button>
 
         <!-- Conteneur principal avec la disposition flex et grille Bootstrap -->
         <div class="d-lg-flex">
@@ -84,7 +87,6 @@ export default {
             // Enregistrement dans le localStorage
             localStorage.setItem("User", JSON.stringify(modifiedUser));
 
-
             // Mise à jour de l'état de modification et de l'utilisateur modifié
             this.modificationSuccess = true;
             this.modifiedUser = modifiedUser;
@@ -108,6 +110,29 @@ export default {
         for (let i = 1; i <= 20; i++) {
             const avatar = { svg: `https://api.dicebear.com/7.x/adventurer/svg?seed=${i}` };
             this.avatars.push(avatar);
+        }
+    },
+    async writeTag() {
+        if ("NDEFReader" in window) {
+            const ndef = new NDEFReader();
+            try {
+                const data = JSON.stringify({
+                    image: 1,
+                    nom: this.nom,
+                    prenom: this.prenom,
+                    email: this.email
+                });
+
+                const encoder = new TextEncoder();
+                const encodedData = encoder.encode(data);
+
+                await ndef.write(encodedData);
+                console.log("NDEF message written!");
+            } catch (error) {
+                console.error(error);
+            }
+        } else {
+            console.error("Web NFC is not supported.");
         }
     }
 };
