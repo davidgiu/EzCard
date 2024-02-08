@@ -110,7 +110,7 @@ export default {
             try {
                 const data = JSON.stringify({
                     image: 1,
-                    nom: "giudice",
+                    nom: "sdfgsdfgfdsg",
                     prenom: "david",
                     email: "david@gmail.com"
                 });
