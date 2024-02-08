@@ -1,6 +1,5 @@
 <template>
     <div class="container">
-        <div class="nfc-indicator" v-if="nfcDetected">NFC détecté</div>
         <div class="row">
             <div class="col-6">
                 <div class="buttons-container d-flex flex-column align-items-start" v-if="!decodedUser">
@@ -9,9 +8,7 @@
                         <button class="btn btn-success mt-5 large-button" @click="importerQRCode">
                             Importer depuis les fichiers
                         </button>
-                        <button class="btn btn-success mt-5 large-button" @click="lireNFC" v-if="nfcDetected">
-                            Lire via NFC
-                        </button>
+                        <button class="btn btn-success mt-5 large-button" @click="readTag">Lire via NFC</button>
                     </div>
                 </div>
             </div>
@@ -156,45 +153,25 @@ export default {
                 reader.readAsDataURL(file);
             }
         },
-        lireNFC() {
+        async readTag() {
             if ("NDEFReader" in window) {
-                const reader = new NDEFReader();
-                reader.scan().then(
-                    ({ records }) => {
-                        this.decoderDonneesNFC(records);
-                    },
-                    (error) => {
-                        console.error("Erreur lors de la lecture NFC :", error);
-                        this.erreurMessage = "Erreur lors de la lecture NFC.";
-                    }
-                );
-            } else {
-                console.error("L'API NFC n'est pas prise en charge par votre navigateur.");
-                this.erreurMessage = "L'API NFC n'est pas prise en charge par votre navigateur.";
-            }
-        },
-        decoderDonneesNFC(records) {
-            records.forEach((record, index) => {
-                switch (record.recordType) {
-                    case "text":
-                        console.log(`Record ${index + 1}: ${record.data}`);
-                        break;
-                    default:
-                        console.warn(`Type de record non pris en charge : ${record.recordType}`);
-                        break;
+                const ndef = new NDEFReader();
+                try {
+                    await ndef.scan();
+                    ndef.onreading = (event) => {
+                        const decoder = new TextDecoder();
+                        for (const record of event.message.records) {
+                            console.log("Record type:  " + record.recordType);
+                            console.log("MIME type:    " + record.mediaType);
+                            console.log("=== data ===\n" + decoder.decode(record.data));
+                        }
+                    };
+                } catch (error) {
+                    console.error(error);
                 }
-            });
-        },
-        decoderTexte(record) {
-            const decoder = new TextDecoder("utf-8"); // ou "utf-16" selon le cas
-            const text = decoder.decode(record.data);
-            console.log(text);
-            return { text };
-        }
-    },
-    mounted() {
-        if ("NDEFReader" in window) {
-            this.nfcDetected = true;
+            } else {
+                console.error("Web NFC is not supported.");
+            }
         }
     }
 };
