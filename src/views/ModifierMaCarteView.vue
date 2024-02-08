@@ -90,12 +90,6 @@ export default {
             // Mise à jour de l'état de modification et de l'utilisateur modifié
             this.modificationSuccess = true;
             this.modifiedUser = modifiedUser;
-
-            // Vider le formulaire
-            this.nom = "";
-            this.prenom = "";
-            this.email = "";
-            this.selectedAvatar = null;
         },
         toggleAvatarList() {
             this.showAvatarList = !this.showAvatarList; // Afficher/masquer la liste d'avatars
@@ -114,7 +108,7 @@ export default {
     },
     async writeTag() {
         if ("NDEFReader" in window) {
-            console.log(this.nom, this.prenom, this.email, this.selectedAvatar)
+            console.log(this.nom, this.prenom, this.email, this.selectedAvatar);
             const ndef = new NDEFReader();
             try {
                 const data = JSON.stringify({
