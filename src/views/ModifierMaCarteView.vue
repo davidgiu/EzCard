@@ -107,32 +107,8 @@ export default {
         }
     },
     async writeTag() {
-        if ("NDEFReader" in window) {
-            if (!this.modifiedUser) {
-                console.error("Aucune donnée utilisateur modifiée à écrire sur NFC.");
-                return;
-            }
-
-            const ndef = new NDEFReader();
-            try {
-                const data = JSON.stringify({
-                    image: this.modifiedUser.avatarIndex,
-                    nom: this.modifiedUser.nom,
-                    prenom: this.modifiedUser.prenom,
-                    email: this.modifiedUser.email
-                });
-
-                const encoder = new TextEncoder();
-                const encodedData = encoder.encode(data);
-
-                await ndef.write(encodedData);
-                console.log("NDEF message written!");
-            } catch (error) {
-                console.error(error);
-            }
-        } else {
-            console.error("Web NFC is not supported.");
-        }
+        console.log("writeTag");
+        console.log(this.modifiedUser);
     }
 };
 </script>
