@@ -114,10 +114,11 @@ export default {
     },
     async writeTag() {
         if ("NDEFReader" in window) {
+            console.log(this.nom, this.prenom, this.email, this.selectedAvatar)
             const ndef = new NDEFReader();
             try {
                 const data = JSON.stringify({
-                    image: 1,
+                    image: this.selectAvatar,
                     nom: this.nom,
                     prenom: this.prenom,
                     email: this.email
