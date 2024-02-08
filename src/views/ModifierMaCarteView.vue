@@ -108,12 +108,11 @@ export default {
     },
     async writeTag() {
         if ("NDEFReader" in window) {
-            console.log(
-                this.modifiedUser.nom,
-                this.modifiedUser.prenom,
-                this.modifiedUser.email,
-                this.modifiedUser.avatarIndex
-            );
+            if (!this.modifiedUser) {
+                console.error("Aucune donnée utilisateur modifiée à écrire sur NFC.");
+                return;
+            }
+
             const ndef = new NDEFReader();
             try {
                 const data = JSON.stringify({
