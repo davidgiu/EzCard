@@ -9,9 +9,7 @@
                             Importer depuis les fichiers
                         </button>
                         <button class="btn btn-success mt-5 large-button" @click="readTag">Lire via NFC</button>
-                        <button class="btn btn-success mt-5 large-button" @click="writeTag" v-if="nfcDetected">
-                            Écrire sur NFC
-                        </button>
+                        <button class="btn btn-success mt-5 large-button" @click="writeTag">Écrire sur NFC</button>
                     </div>
                 </div>
             </div>
