@@ -78,15 +78,15 @@ export default {
             if ("NDEFReader" in window) {
                 const ndef = new NDEFReader();
                 try {
-                    const data = JSON.stringify({
+                    const data = {
                         nom: this.nom,
                         prenom: this.prenom,
                         email: this.email,
                         avatarIndex: this.selectedAvatar
-                    });
+                    };
 
                     const encoder = new TextEncoder();
-                    const encodedData = encoder.encode(data);
+                    const encodedData = encoder.encode(JSON.stringify(data));
 
                     await ndef.write(encodedData);
                     console.log("NDEF message written!");
