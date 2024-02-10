@@ -2,21 +2,19 @@
     <div class="row">
         <div class="col">
             <!-- Colonne pour les boutons -->
-
             <router-link to="/montre-ma-carte">
-                <button class="boutton">Ma Carte</button>
+                <button class="boutton btn-lg btn-md-sm">Ma Carte</button>
             </router-link>
         </div>
         <div class="col">
             <router-link to="/lire-carte">
-                <button class="boutton">Lire une Carte</button>
+                <button class="boutton btn-lg btn-md-sm">Lire une Carte</button>
             </router-link>
         </div>
     </div>
     <h2 class="mt-5">Cartes enregistrées :</h2>
-    <div class="row justify-content-start mt-4">
+    <div class="row justify-content-center mt-4">
         <div class="col-12">
-            
             <!-- Carousel -->
             <div v-if="cartes.length > 0" class="carousel-container">
                 <div id="cartesCarousel" class="carousel slide" data-bs-ride="carousel">
@@ -31,7 +29,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- Message si aucune carte enregistrée -->
             <div v-else class="alert alert-danger mt-3" role="alert">Aucune carte enregistrée.</div>
         </div>
@@ -65,18 +62,30 @@ h2 {
     color: white;
 }
 .boutton {
-    width: 110%;
+    width: 500px;
+    height: 200px;
     padding: 10px;
     margin: 10px;
-    background-color: #5607FF;
+    background-color: #5607ff;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 1.1rem;
+    font-size: 4rem;
     font-weight: bold;
 }
 .carte-two-times-larger {
     transform: scale(2);
+}
+
+/* Styles pour les boutons sur les petits écrans */
+@media (max-width: 767px) {
+    .boutton {
+        width: 300px;
+        height: 100px;
+        font-size: 2rem;
+        margin-top: -50px;
+        margin-bottom: 60px;
+    }
 }
 </style>

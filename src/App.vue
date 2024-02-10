@@ -1,5 +1,5 @@
 <template>
-    <div class="container d-flex">
+    <div class="container d-flex justify-content-center">
         <div class="row">
             <div class="col-12">
                 <NavbarComponent></NavbarComponent>
@@ -23,7 +23,10 @@ export default {
 </script>
 
 <style>
-
+#app {
+    height: 100%;
+    width: 100%;
+}
 body {
     background: #96afff;
     font-family: "Roboto", sans-serif;
