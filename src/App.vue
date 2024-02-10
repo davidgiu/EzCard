@@ -1,7 +1,11 @@
 <template>
-    <div class="main">
-        <NavbarComponent></NavbarComponent>
-        <RouterView></RouterView>
+    <div class="container d-flex">
+        <div class="row">
+            <div class="col-12">
+                <NavbarComponent></NavbarComponent>
+            </div>
+            <div class="col-12"><RouterView></RouterView></div>
+        </div>
     </div>
 </template>
 
@@ -19,11 +23,10 @@ export default {
 </script>
 
 <style>
-.main {
-    display: flex;
-}
 
 body {
-    background: #3c3c3c;
+    background: #96afff;
+    font-family: "Roboto", sans-serif;
 }
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap')
 </style>

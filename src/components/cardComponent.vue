@@ -78,11 +78,11 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 /* Styles spécifiques à CardComponent.vue */
 .carte {
-    height: 300px;
-    width: 500px;
+    height: auto;
+    width: auto;
     text-align: center;
     padding: 20px;
     background-color: #ffffff;

@@ -14,49 +14,46 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
+                <ul class="navbar-nav w-100 d-flex justify-content-between">
                     <li class="nav-item">
-                        <router-link to="/">
-                            <a class="nav-link" :class="{ 'active bg-success': $route.path === '/' }" href="#"
-                                >Accueil</a
-                            >
+                        <router-link to="/" class="nav-link" :class="{ active: $route.path === '/' }">
+                            Accueil
                         </router-link>
                     </li>
                     <li class="nav-item">
-                        <router-link to="/montre-ma-carte">
-                            <a
-                                class="nav-link"
-                                :class="{ 'active bg-success': $route.path === '/montre-ma-carte' }"
-                                href="#"
-                                >Montre ma carte</a
-                            >
+                        <router-link
+                            to="/montre-ma-carte"
+                            class="nav-link"
+                            :class="{ active: $route.path === '/montre-ma-carte' }"
+                        >
+                            Ma Carte
                         </router-link>
                     </li>
                     <li class="nav-item">
-                        <router-link to="/lire-carte">
-                            <a class="nav-link" :class="{ 'active bg-success': $route.path === '/lire-carte' }" href="#"
-                                >Lire une carte</a
-                            >
+                        <router-link
+                            to="/lire-carte"
+                            class="nav-link"
+                            :class="{ active: $route.path === '/lire-carte' }"
+                        >
+                            Lire une Carte
                         </router-link>
                     </li>
                     <li class="nav-item">
-                        <router-link to="/modifier-ma-carte">
-                            <a
-                                class="nav-link"
-                                :class="{ 'active bg-success': $route.path === '/modifier-ma-carte' }"
-                                href="#"
-                                >Modifier ma carte</a
-                            >
+                        <router-link
+                            to="/modifier-ma-carte"
+                            class="nav-link"
+                            :class="{ active: $route.path === '/modifier-ma-carte' }"
+                        >
+                            Modifier ma Carte
                         </router-link>
                     </li>
                     <li class="nav-item">
-                        <router-link to="/cartes-contacts">
-                            <a
-                                class="nav-link"
-                                :class="{ 'active bg-success': $route.path === '/cartes-contacts' }"
-                                href="#"
-                                >Cartes contacts</a
-                            >
+                        <router-link
+                            to="/cartes-contacts"
+                            class="nav-link"
+                            :class="{ active: $route.path === '/cartes-contacts' }"
+                        >
+                            Cartes Contacts
                         </router-link>
                     </li>
                 </ul>
@@ -83,5 +80,24 @@ img {
     width: 50px;
     height: 50px;
 }
-
+a {
+    text-decoration: none;
+    color: white; /* Couleur par défaut des liens */
+}
+.nav-item a:hover {
+    width: 100%;
+    background-color: #5607ff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+}
+.nav-link.active {
+    width: 100%;
+    background-color: #5607ff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+}
 </style>
