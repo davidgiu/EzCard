@@ -90,6 +90,7 @@ export default {
 
                     await ndef.write(encodedData);
                     console.log("NDEF message written!");
+                    console.log(data);
                 } catch (error) {
                     console.error(error);
                 }
