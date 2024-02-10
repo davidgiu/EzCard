@@ -73,6 +73,30 @@ export default {
         };
     },
     methods: {
+        async writeTag() {
+            console.log("Ecriture sur NFC");
+            if ("NDEFReader" in window) {
+                const ndef = new NDEFReader();
+                try {
+                    const data = JSON.stringify({
+                        image: this.selectAvatar,
+                        nom: this.nom,
+                        prenom: this.prenom,
+                        email: this.email
+                    });
+
+                    const encoder = new TextEncoder();
+                    const encodedData = encoder.encode(data);
+
+                    await ndef.write(encodedData);
+                    console.log("NDEF message written!");
+                } catch (error) {
+                    console.error(error);
+                }
+            } else {
+                console.error("Web NFC is not supported.");
+            }
+        },
         submitForm() {
             // Création de l'objet User avec les données du formulaire et l'index de l'avatar
             const modifiedUser = {
@@ -102,29 +126,6 @@ export default {
         for (let i = 1; i <= 20; i++) {
             const avatar = { svg: `https://api.dicebear.com/7.x/adventurer/svg?seed=${i}` };
             this.avatars.push(avatar);
-        }
-    },
-    async writeTag() {
-        if ("NDEFReader" in window) {
-            const ndef = new NDEFReader();
-            try {
-                const data = JSON.stringify({
-                    image: 1,
-                    nom: "sdfgsdfgfdsg",
-                    prenom: "david",
-                    email: "david@gmail.com"
-                });
-
-                const encoder = new TextEncoder();
-                const encodedData = encoder.encode(data);
-
-                await ndef.write(encodedData);
-                console.log("NDEF message written!");
-            } catch (error) {
-                console.error(error);
-            }
-        } else {
-            console.error("Web NFC is not supported.");
         }
     }
 };
