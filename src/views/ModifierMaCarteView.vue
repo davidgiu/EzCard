@@ -79,10 +79,10 @@ export default {
                 const ndef = new NDEFReader();
                 try {
                     const data = JSON.stringify({
-                        image: this.selectAvatar,
                         nom: this.nom,
                         prenom: this.prenom,
-                        email: this.email
+                        email: this.email,
+                        avatarIndex: this.selectedAvatar
                     });
 
                     const encoder = new TextEncoder();
