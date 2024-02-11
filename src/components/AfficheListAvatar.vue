@@ -88,6 +88,6 @@ export default {
 /* Styles spécifiques pour le composant */
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
-    background-color: green;
+    background-color: #5607ff;
 }
 </style>

@@ -1,13 +1,13 @@
 <template>
-    <div class="container d-flex justify-content-center">
+    <div class="container-fluid">
         <div class="row">
             <div class="col-12">
                 <NavbarComponent></NavbarComponent>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <RouterView></RouterView>
+            <div class="col-12 mt-5">
+                <div class="container-fluid mt-5">
+                    <RouterView></RouterView>
+                </div>
             </div>
         </div>
     </div>

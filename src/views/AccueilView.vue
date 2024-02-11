@@ -1,20 +1,19 @@
 <template>
-    <div class="row">
+    <div class="row mt-5">
         <div class="col">
             <!-- Colonne pour les boutons -->
             <router-link to="/montre-ma-carte">
                 <button class="boutton btn-lg btn-md-sm">Ma Carte</button>
             </router-link>
         </div>
-        <div class="col">
+        <div class="col-6">
             <router-link to="/lire-carte">
                 <button class="boutton btn-lg btn-md-sm">Lire une Carte</button>
             </router-link>
         </div>
     </div>
-    <h2 class="mt-5">Cartes enregistrées :</h2>
-    <div class="row justify-content-center mt-4">
-        <div class="col-12">
+    <div class="row">
+        <div class="col mt-3">
             <!-- Carousel -->
             <div v-if="cartes.length > 0" class="carousel-container">
                 <div id="cartesCarousel" class="carousel slide" data-bs-ride="carousel">
@@ -56,16 +55,9 @@ export default {
 </script>
 
 <style>
-h2 {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: white;
-}
 .boutton {
     width: 500px;
     height: 200px;
-    padding: 10px;
-    margin: 10px;
     background-color: #5607ff;
     color: white;
     border: none;
@@ -74,11 +66,6 @@ h2 {
     font-size: 4rem;
     font-weight: bold;
 }
-.card-size {
-    /* Utilisez les classes de Bootstrap pour définir la taille du composant */
-    width: 100%; /* Par exemple, occupe toute la largeur de son conteneur */
-    height: auto; /* Ajuste la hauteur en fonction du contenu */
-}
 
 /* Styles pour les boutons sur les petits écrans */
 @media (max-width: 767px) {
@@ -86,8 +73,7 @@ h2 {
         width: 300px;
         height: 100px;
         font-size: 2rem;
-        margin-top: -50px;
-        margin-bottom: 60px;
+        margin-bottom: 20px;
     }
 
 }

@@ -1,53 +1,60 @@
 <template>
-    <div class="modifier-ma-carte-container">
-        <!-- Bouton pour afficher la liste d'avatars -->
-        <div class="mb-3">
-            <button @click="toggleAvatarList" v-if="!showAvatarList" class="btn btn-success">
-                Afficher Liste d'Avatar
-            </button>
-            <AfficheListAvatar v-if="showAvatarList" @selectAvatar="selectAvatar" />
-        </div>
+    <div class="d-flex">
+        
+    </div>
+    <div class="row">
+        <!-- Formulaire dans une colonne Bootstrap sur les écrans de grande taille (desktop) -->
+        <div class="form-container">
+            <form @submit.prevent="submitForm">
+                <div class="row align-items-center">
+                    <div class="col-4">
+                        <AfficheListAvatar v-if="showAvatarList" @selectAvatar="selectAvatar" />
+                        <img
+                            v-if="selectedAvatar && !showAvatarList"
+                            :src="avatars[selectedAvatar].svg"
+                            alt="Avatar sélectionné"
+                            class="selected-avatar"
+                        />
+                    </div>
+                    <div class="col-8">
+                        <button @click="toggleAvatarList" v-if="!showAvatarList" class="boutton4">
+                            Séléctionner son Avatar
+                        </button>
+                    </div>
+                </div>
 
-        <!-- Conteneur principal avec la disposition flex et grille Bootstrap -->
-        <div class="d-lg-flex">
-            <!-- Formulaire dans une colonne Bootstrap sur les écrans de grande taille (desktop) -->
-            <div class="form-container col-lg-6">
-                <form @submit.prevent="submitForm">
-                    <label for="nom">Nom:</label>
-                    <input type="text" v-model="nom" required />
-
-                    <label for="prenom">Prénom:</label>
-                    <input type="text" v-model="prenom" required />
-
+                <div class="row align-items-center">
+                    <div class="col-12">
+                        <label for="nom">Nom:</label>
+                        <input type="text" v-model="nom" required />
+                    </div>
+                    <div class="col-12">
+                        <label for="prenom">Prénom:</label>
+                        <input type="text" v-model="prenom" required />
+                    </div>
+                </div>
+                <div class="col-12">
                     <label for="email">Adresse email:</label>
                     <input type="email" v-model="email" required />
-
-                    <!-- Afficher l'avatar sélectionné -->
-                    <img
-                        v-if="selectedAvatar"
-                        :src="avatars[selectedAvatar].svg"
-                        alt="Avatar sélectionné"
-                        class="selected-avatar"
-                    />
-
-                    <button type="submit" class="btn btn-success mt-3">Modifier</button>
-                </form>
-                <!-- Message de confirmation -->
-                <p v-if="modificationSuccess" class="alert alert-success mt-1" role="alert">
-                    Les modifications ont bien été apportées!
-                </p>
-            </div>
-
-            <!-- Espace entre le formulaire et la carte sur les écrans de grande taille -->
-            <div class="flex-lg-grow-1" style="width: 30px"></div>
-
-            <!-- Carte modifiée à droite sur les écrans de grande taille -->
-            <div class="card-container col-lg-6 mt-3">
-                <cardComponent v-if="modificationSuccess" :user="modifiedUser" />
-            </div>
+                </div>
+                <div class="col-12"><button type="submit" class="boutton4">Modifier</button></div>
+                <div class="col-12">
+                    <p v-if="modificationSuccess" class="alert alert-success mt-3" role="alert">
+                        Les modifications ont bien été apportées!
+                    </p>
+                </div>
+            </form>
         </div>
-        <button class="btn btn-success mt-5 large-button" @click="writeTag">Écrire sur NFC</button>
     </div>
+    <div class="row">
+        <div class="col mt-5">
+            <cardComponent v-if="modificationSuccess" :user="modifiedUser" />
+        </div>
+        <div class="col mt-3" v-if="modificationSuccess">
+            <button @click="writeTag" class="boutton4">Ecrire sur la Carte NFC</button>
+        </div>
+    </div>
+    <!-- Carte modifiée à droite sur les écrans de grande taille -->
 </template>
 
 <script>
@@ -135,16 +142,23 @@ export default {
 <style>
 /* Styles spécifiques au composant */
 /* Ajoutez vos styles de formulaire personnalisés ici */
-.modifier-ma-carte-container {
-    margin-top: 150px;
+.boutton4 {
+    width: 100%;
+    height: 50px;
+    background-color: #5607ff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.5rem;
+    font-weight: bold;
 }
 .form-container {
-    height: 400px;
-    width: 500px;
+    height: auto;
+    width: auto;
     background-color: #121212;
     padding: 20px;
     border-radius: 10px;
-
     color: white;
 }
 
@@ -157,34 +171,10 @@ input {
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
-    box-sizing: border-box;
 }
 
 .selected-avatar {
-    max-width: 100px;
+    max-width: 10rem;
     margin-top: 10px;
-}
-
-button {
-    cursor: pointer;
-}
-
-h1 {
-    position: fixed;
-    top: 10px;
-    left: 600px;
-    color: white;
-    font-size: 60pt;
-}
-
-.success-message {
-    position: absolute;
-    top: 100%; /* Placer en bas du conteneur parent */
-    left: 20px;
-    color: #1db954;
-}
-
-.card-container {
-    margin-top: 20px; /* Ajouter un espace entre le formulaire et la carte */
 }
 </style>
