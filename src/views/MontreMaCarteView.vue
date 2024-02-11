@@ -61,8 +61,7 @@ export default {
 }
 
 .qrcode-large {
-    width: 100;
-    height: 100; /* Ajustez la taille du grand QR Code selon vos préférences */
+    width: 20em;
 }
 
 /* Définition de la taille de la carte en fonction de la taille de l'écran */
