@@ -1,50 +1,42 @@
 <template>
-    <div class="container">
-        <div class="row">
-            <div class="col-6">
-                <div class="buttons-container d-flex flex-column align-items-start" v-if="!decodedUser">
-                    <div class="d-flex flex-column align-items-center mb-5">
-                        <button class="btn btn-success mt-5 large-button" @click="demarrerCamera">Caméra</button>
-                        <button class="btn btn-success mt-5 large-button" @click="importerQRCode">
-                            Importer depuis les fichiers
-                        </button>
-                        <button class="btn btn-success mt-5 large-button" @click="readTag">Lire via NFC</button>
-                        <button class="btn btn-success mt-5 large-button" @click="writeTag">Écrire sur NFC</button>
-                    </div>
-                </div>
+    <div v-if="!decodedUser" class="row">
+        <div class="col-12">
+            <button class="boutton3" @click="readTag">NFC</button>
+        </div>
+        <div class="col-6"><button class="boutton3" @click="demarrerCamera">Qr Code</button></div>
+        <div class="col">
+            <button class="boutton3" @click="importerQRCode">Fichiers</button>
+        </div>
+    </div>
+    <div v-if="decodedUser" class="row">
+        <div class="col">
+            <button class="boutton3" @click="enregistrerCarte">Enregistrer la Carte</button>
+        </div>
+        <div class="col-12">
+            <div v-if="validationMessage" class="alert alert-success mt-3" role="alert">
+                {{ validationMessage }}
             </div>
-            <div class="col-6 mt-5">
-                <div class="buttons-container d-flex flex-column align-items-center">
-                    <div class="d-flex flex-column align-items-center">
-                        <QrcodeStream
-                            v-if="cameraActive && !decodedUser && !capturing"
-                            @decode="onDecode"
-                            style="max-width: 80%"
-                        />
-                        <button
-                            class="btn btn-success small-button"
-                            v-if="cameraActive && !decodedUser && !capturing"
-                            @click="capturerPhoto"
-                        >
-                            Capture Photo
-                        </button>
-                    </div>
-                    <input type="file" ref="fileInput" @change="handleFileChange" style="display: none" />
-                </div>
+        </div>
+        <div class="col"><button class="boutton3" @click="annulerCarte">Annuler</button></div>
+        <div class="col-12 mt-5"><cardComponent :user="decodedUser" /></div>
+    </div>
+    <div class="col-6 mt-5">
+        <div class="buttons-container d-flex flex-column align-items-center">
+            <div class="d-flex flex-column align-items-center">
+                <QrcodeStream
+                    v-if="cameraActive && !decodedUser && !capturing"
+                    @decode="onDecode"
+                    style="max-width: 80%"
+                />
+                <button
+                    class="btn btn-success small-button"
+                    v-if="cameraActive && !decodedUser && !capturing"
+                    @click="capturerPhoto"
+                >
+                    Capture Photo
+                </button>
             </div>
-            <div class="col-12">
-                <div class="content-container d-flex flex-column align-items-end" v-if="decodedUser">
-                    <button class="btn btn-success mb-5 large-button" @click="enregistrerCarte">
-                        Enregistrer la Carte
-                    </button>
-                    <div v-if="validationMessage" class="alert alert-success mt-3" role="alert">
-                        {{ validationMessage }}
-                    </div>
-                    <div>
-                        <cardComponent :user="decodedUser" />
-                    </div>
-                </div>
-            </div>
+            <input type="file" ref="fileInput" @change="handleFileChange" style="display: none" />
         </div>
     </div>
 
@@ -72,6 +64,10 @@ export default {
         };
     },
     methods: {
+        annulerCarte() {
+            this.decodedUser = null; // Réinitialiser les données associées à la carte
+            this.validationMessage = ""; // Réinitialiser le message de validation
+        },
         demarrerCamera() {
             this.cameraActive = !this.cameraActive;
         },
@@ -222,5 +218,26 @@ export default {
     font-size: 20px;
     color: green;
     margin-bottom: 10px;
+}
+.boutton3 {
+    width: 100%;
+    height: 150pt;
+    padding: 10px;
+    margin: 10px;
+    background-color: #5607ff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 4rem;
+    font-weight: bold;
+}
+@media (max-width: 767px) {
+    .boutton3 {
+        width: 300px;
+        height: 100px;
+        font-size: 2rem;
+        margin-bottom: 60px;
+    }
 }
 </style>
