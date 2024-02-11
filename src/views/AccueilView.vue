@@ -24,7 +24,7 @@
                             :key="index"
                             :class="{ 'carousel-item': true, active: index === 0 }"
                         >
-                            <cardComponent :user="carte" />
+                            <cardComponent class="card-size" :user="carte" />
                         </div>
                     </div>
                 </div>
@@ -74,8 +74,10 @@ h2 {
     font-size: 4rem;
     font-weight: bold;
 }
-.carte-two-times-larger {
-    transform: scale(2);
+.card-size {
+    /* Utilisez les classes de Bootstrap pour définir la taille du composant */
+    width: 100%; /* Par exemple, occupe toute la largeur de son conteneur */
+    height: auto; /* Ajuste la hauteur en fonction du contenu */
 }
 
 /* Styles pour les boutons sur les petits écrans */
@@ -87,5 +89,6 @@ h2 {
         margin-top: -50px;
         margin-bottom: 60px;
     }
+
 }
 </style>
