@@ -1,7 +1,5 @@
 <template>
-    <div class="d-flex">
-        
-    </div>
+    <div class="d-flex"></div>
     <div class="row">
         <!-- Formulaire dans une colonne Bootstrap sur les écrans de grande taille (desktop) -->
         <div class="form-container">
@@ -53,6 +51,9 @@
         <div class="col mt-3" v-if="modificationSuccess">
             <button @click="writeTag" class="boutton4">Ecrire sur la Carte NFC</button>
         </div>
+        <div class="col-12">
+            <p v-if="nfcSuccess" class="alert alert-success mt-3" role="alert">La carte est sur le NFC !</p>
+        </div>
     </div>
     <!-- Carte modifiée à droite sur les écrans de grande taille -->
 </template>
@@ -76,7 +77,8 @@ export default {
             showAvatarList: false,
             avatars: [],
             modificationSuccess: false,
-            modifiedUser: null
+            modifiedUser: null,
+            nfcSuccess: false
         };
     },
     methods: {
@@ -97,6 +99,8 @@ export default {
 
                     await ndef.write(encodedData);
                     console.log("NDEF message written!");
+                    this.modificationSuccess = true;
+
                     console.log(data);
                 } catch (error) {
                     console.error(error);
