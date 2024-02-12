@@ -1,5 +1,5 @@
 <template>
-    <div class="row">
+    <div class="row mt-5">
         <div class="col-12 mb-5">
             <button class="boutton4" @click="toggleAfficherToutesLesCartes">
                 {{ afficherToutesCartes ? "Masquer toutes les cartes" : "Afficher toutes les cartes" }}
@@ -57,12 +57,15 @@
                 </div>
             </div>
             <!-- Afficher toutes les cartes si l'option est activée -->
-            <div v-else>
-                <div class="row justify-content-start">
-                    <div class="col-6 m-4" v-for="(carte, index) in cartes" :key="index">
-                        <cardComponent :user="carte" />
-                    </div>
-                </div>
+        </div>
+    </div>
+    <div class="row" v-if="afficherToutesCartes">
+        <div class="col-lg-6 mb-5" v-for="(carte, index) in cartes" :key="index">
+            <div class="carteGroup d-flex">
+                <cardComponent :user="carte" />
+                <button class="btn btn-danger col-2" @click="supprimerCarte">
+                    <i class="fa-solid fa-trash-can" style="color: #ffffff"></i>
+                </button>
             </div>
         </div>
     </div>
@@ -95,12 +98,12 @@ export default {
 </script>
 
 <style>
-/* Ajoutez vos styles personnalisés ici si nécessaire */
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
-    background-color: green;
+    background-color: #5607ff;
 }
-.container {
-    margin-top: 150px;
+.carte {
+    width: 100%;
+    height: 100%;
 }
 </style>
