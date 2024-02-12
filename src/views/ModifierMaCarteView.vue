@@ -1,61 +1,60 @@
 <template>
-    <div class="d-flex"></div>
-    <div class="row">
-        <!-- Formulaire dans une colonne Bootstrap sur les écrans de grande taille (desktop) -->
-        <div class="form-container">
-            <form @submit.prevent="submitForm">
-                <div class="row align-items-center">
-                    <div class="col-4">
-                        <AfficheListAvatar v-if="showAvatarList" @selectAvatar="selectAvatar" />
-                        <img
-                            v-if="selectedAvatar && !showAvatarList"
-                            :src="avatars[selectedAvatar].svg"
-                            alt="Avatar sélectionné"
-                            class="selected-avatar"
-                        />
-                    </div>
-                    <div class="col-8">
-                        <button @click="toggleAvatarList" v-if="!showAvatarList" class="boutton4">
-                            Séléctionner son Avatar
-                        </button>
-                    </div>
-                </div>
-
-                <div class="row align-items-center">
-                    <div class="col-12">
-                        <label for="nom">Nom:</label>
-                        <input type="text" v-model="nom" required />
-                    </div>
-                    <div class="col-12">
-                        <label for="prenom">Prénom:</label>
-                        <input type="text" v-model="prenom" required />
-                    </div>
-                </div>
-                <div class="col-12">
-                    <label for="email">Adresse email:</label>
-                    <input type="email" v-model="email" required />
-                </div>
-                <div class="col-12"><button type="submit" class="boutton4">Modifier</button></div>
-                <div class="col-12">
-                    <p v-if="modificationSuccess" class="alert alert-success mt-3" role="alert">
-                        Les modifications ont bien été apportées!
-                    </p>
-                </div>
-            </form>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col mt-5">
-            <cardComponent v-if="modificationSuccess" :user="modifiedUser" />
-        </div>
-        <div class="col mt-3" v-if="modificationSuccess">
-            <button @click="writeTag" class="boutton4">Ecrire sur la Carte NFC</button>
-        </div>
+    <div class="row mt-5">
         <div class="col-12">
-            <p v-if="nfcSuccess" class="alert alert-success mt-3" role="alert">La carte est sur le NFC !</p>
+            <div class="form-container">
+                <form @submit.prevent="submitForm">
+                    <div class="row align-items-center">
+                        <div class="col-6">
+                            <AfficheListAvatar v-if="showAvatarList" @selectAvatar="selectAvatar" />
+                            <img
+                                v-if="selectedAvatar && !showAvatarList"
+                                :src="avatars[selectedAvatar].svg"
+                                alt="Avatar sélectionné"
+                                class="selected-avatar"
+                            />
+                        </div>
+                        <div class="col-6 mb-4 sel">
+                            <button @click="toggleAvatarList" v-if="!showAvatarList" class="boutton4">
+                                Séléctionner Avatar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center">
+                        <div class="col-12">
+                            <label for="nom">Nom:</label>
+                            <input type="text" v-model="nom" required />
+                        </div>
+                        <div class="col-12">
+                            <label for="prenom">Prénom:</label>
+                            <input type="text" v-model="prenom" required />
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label for="email">Adresse email:</label>
+                        <input type="email" v-model="email" required />
+                    </div>
+                    <div class="col-12"><button type="submit" class="boutton4">Modifier</button></div>
+                    <div class="col-12">
+                        <p v-if="modificationSuccess" class="alert alert-success mt-3" role="alert">
+                            Les modifications ont bien été apportées!
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col mt-5">
+                <cardComponent v-if="modificationSuccess" :user="modifiedUser" />
+            </div>
+            <div class="col mt-3" v-if="modificationSuccess">
+                <button @click="writeTag" class="boutton4">Ecrire sur la Carte NFC</button>
+            </div>
+            <div class="col-12">
+                <p v-if="nfcSuccess" class="alert alert-success mt-3" role="alert">La carte est sur le NFC !</p>
+            </div>
         </div>
     </div>
-    <!-- Carte modifiée à droite sur les écrans de grande taille -->
 </template>
 
 <script>
@@ -157,6 +156,16 @@ export default {
     font-size: 1.5rem;
     font-weight: bold;
 }
+@media (max-width: 767px) {
+    .boutton4 {
+        font-size: 1.5rem;
+        height: auto;
+        margin-bottom: 20px;
+    }
+    .sel .boutton4 {
+        font-size: 1rem;
+    }
+}
 .form-container {
     height: auto;
     width: auto;
@@ -179,6 +188,5 @@ input {
 
 .selected-avatar {
     max-width: 10rem;
-    margin-top: 10px;
 }
 </style>
