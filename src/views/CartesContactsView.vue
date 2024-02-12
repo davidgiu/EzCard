@@ -11,7 +11,7 @@
                 <div v-if="cartes.length === 0" class="alert alert-danger mt-3" role="alert">
                     Aucune carte enregistrée.
                 </div>
-                <div v-else>
+                <div v-if="afficherToutesCartes">
                     <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
                         <div class="carousel-indicators">
                             <button
@@ -63,8 +63,8 @@
         <div class="col-lg-6 mb-5" v-for="(carte, index) in cartes" :key="index">
             <div class="carteGroup d-flex">
                 <cardComponent :user="carte" />
-                <button class="btn btn-danger col-2" @click="supprimerCarte">
-                    <i class="fa-solid fa-trash-can" style="color: #ffffff"></i>
+                <button class="btn btn-danger col-2" @click="supprimerCarte(index)">
+                    <i class="fa-regular fa-trash-can ic"></i>
                 </button>
             </div>
         </div>
@@ -89,6 +89,13 @@ export default {
     methods: {
         toggleAfficherToutesLesCartes() {
             this.afficherToutesCartes = !this.afficherToutesCartes;
+        },
+        supprimerCarte(index) {
+            // Supprimer la carte de la liste 'cartes' en utilisant son index
+            this.cartes.splice(index, 1);
+
+            // Mettre à jour le stockage local avec la nouvelle liste de cartes
+            localStorage.setItem("cartes", JSON.stringify(this.cartes));
         }
     },
     components: {
@@ -105,5 +112,8 @@ export default {
 .carte {
     width: 100%;
     height: 100%;
+}
+.ic {
+    font-size: 3rem;
 }
 </style>
