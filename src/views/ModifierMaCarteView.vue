@@ -99,7 +99,7 @@ export default {
 
                     await ndef.write(encodedData);
                     console.log("NDEF message written!");
-                    this.modificationSuccess = true;
+                    this.nfcSuccess = true;
 
                     console.log(data);
                 } catch (error) {
