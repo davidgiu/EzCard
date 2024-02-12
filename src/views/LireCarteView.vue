@@ -1,5 +1,5 @@
 <template>
-    <div v-if="!decodedUser" class="row">
+    <div v-if="!decodedUser" class="row mt-5">
         <div class="col-12 mb-4">
             <button class="boutton3" @click="readTag">NFC</button>
         </div>
@@ -8,14 +8,14 @@
             <button class="boutton3" @click="importerQRCode">Fichiers</button>
         </div>
     </div>
-    <div v-if="decodedUser" class="row">
+    <div v-if="decodedUser" class="row mt-5">
         <div class="col-6" v-if="!validationMessage">
             <button class="boutton3" @click="enregistrerCarte">Enregistrer la Carte</button>
         </div>
         <div class="col-12" v-if="validationMessage">
             <button class="boutton3" @click="annulerCarte">Lire un nouvelle carte</button>
         </div>
-        <div class="col-6" v-if="!validationMessage">
+        <div class="col" v-if="!validationMessage">
             <button class="boutton3" @click="annulerCarte">Annuler</button>
         </div>
         <div class="col-12">
@@ -224,7 +224,7 @@ export default {
         width: 300px;
         height: 100px;
         font-size: 2rem;
-        margin-bottom: 60px;
+        margin-bottom: 20px;
     }
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div class="row">
+    <div class="row mt-4">
         <div class="col">
             <!-- Colonne pour les boutons -->
             <router-link to="/montre-ma-carte">

@@ -1,6 +1,6 @@
 <template>
     <div class="row test">
-        <div class="col col-xs-12 mb-5">
+        <div class="col col-xs-12 mt-5">
             <div class="d-flex justify-content-center">
                 <cardComponent :user="userFromLocalStorage" />
 
@@ -9,7 +9,7 @@
                 </button>
             </div>
         </div>
-        <div class="col" v-if="showQRCode">
+        <div class="col mt-5" v-if="showQRCode">
             <div class="qrcode-large-section">
                 <vue-qrcode :value="generateQRCodeValue" class="qrcode-large"></vue-qrcode>
             </div>
