@@ -63,7 +63,7 @@
         <div class="col-lg-6 mb-5" v-for="(carte, index) in cartes" :key="index">
             <div class="carteGroup d-flex">
                 <cardComponent :user="carte" />
-                <button class="btn btn-danger col-2" @click="supprimerCarte()">
+                <button class="btn btn-danger col-2" @click="supprimerCarte(index)">
                     <i class="fa-regular fa-trash-can ic"></i>
                 </button>
             </div>
