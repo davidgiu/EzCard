@@ -1,19 +1,19 @@
 <template>
-    <div class="row mt-5">
+    <div class="row">
         <div class="col">
             <!-- Colonne pour les boutons -->
             <router-link to="/montre-ma-carte">
-                <button class="boutton btn-lg btn-md-sm">Ma Carte</button>
+                <button class="boutton">Ma Carte</button>
             </router-link>
         </div>
         <div class="col-6">
             <router-link to="/lire-carte">
-                <button class="boutton btn-lg btn-md-sm">Lire une Carte</button>
+                <button class="boutton">Lire une Carte</button>
             </router-link>
         </div>
     </div>
     <div class="row">
-        <div class="col mt-3">
+        <div class="col-12 mt-3">
             <!-- Carousel -->
             <div v-if="cartes.length > 0" class="carousel-container">
                 <div id="cartesCarousel" class="carousel slide" data-bs-ride="carousel">
@@ -56,7 +56,7 @@ export default {
 
 <style>
 .boutton {
-    width: 500px;
+    width: 100%;
     height: 200px;
     background-color: #5607ff;
     color: white;
@@ -75,6 +75,5 @@ export default {
         font-size: 2rem;
         margin-bottom: 20px;
     }
-
 }
 </style>

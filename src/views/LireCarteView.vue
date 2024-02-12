@@ -1,23 +1,28 @@
 <template>
     <div v-if="!decodedUser" class="row">
-        <div class="col-12">
+        <div class="col-12 mb-4">
             <button class="boutton3" @click="readTag">NFC</button>
         </div>
-        <div class="col-6"><button class="boutton3" @click="demarrerCamera">Qr Code</button></div>
-        <div class="col">
+        <div class="col-6 mb-4"><button class="boutton3" @click="demarrerCamera">Qr Code</button></div>
+        <div class="col-lg-6">
             <button class="boutton3" @click="importerQRCode">Fichiers</button>
         </div>
     </div>
     <div v-if="decodedUser" class="row">
-        <div class="col">
+        <div class="col-6" v-if="!validationMessage">
             <button class="boutton3" @click="enregistrerCarte">Enregistrer la Carte</button>
+        </div>
+        <div class="col-12" v-if="validationMessage">
+            <button class="boutton3" @click="annulerCarte">Lire un nouvelle carte</button>
+        </div>
+        <div class="col-6" v-if="!validationMessage">
+            <button class="boutton3" @click="annulerCarte">Annuler</button>
         </div>
         <div class="col-12">
             <div v-if="validationMessage" class="alert alert-success mt-3" role="alert">
                 {{ validationMessage }}
             </div>
         </div>
-        <div class="col"><button class="boutton3" @click="annulerCarte">Annuler</button></div>
         <div class="col-12 mt-5"><cardComponent :user="decodedUser" /></div>
     </div>
     <div class="col-6 mt-5">
@@ -200,30 +205,12 @@ export default {
 </script>
 
 <style>
-.large-button {
-    font-size: 35px;
-    height: 100px;
-    width: 500px;
-    margin-left: 50px;
-}
 
-.small-button {
-    font-size: 20px;
-    height: 50px;
-    width: 200px;
-    margin-left: 50px;
-}
 
-.nfc-indicator {
-    font-size: 20px;
-    color: green;
-    margin-bottom: 10px;
-}
+
 .boutton3 {
     width: 100%;
     height: 150pt;
-    padding: 10px;
-    margin: 10px;
     background-color: #5607ff;
     color: white;
     border: none;

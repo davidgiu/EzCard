@@ -4,11 +4,7 @@
             <div class="col-12">
                 <NavbarComponent></NavbarComponent>
             </div>
-            <div class="col-12 mt-5">
-                <div class="container-fluid mt-5">
-                    <RouterView></RouterView>
-                </div>
-            </div>
+            <div class="container"><RouterView></RouterView></div>
         </div>
     </div>
 </template>

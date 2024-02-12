@@ -1,20 +1,17 @@
 <template>
-    <div class="container-fluid">
-        <!-- Utilisation du composant CardComponent avec les données récupérées du localStorage -->
-        <div class="row test align-item-center">
-            <div class="col col-xs-6 mb-5">
-                <div class="d-flex justify-content-center">
-                    <cardComponent :user="userFromLocalStorage" />
+    <div class="row test">
+        <div class="col col-xs-12 mb-5">
+            <div class="d-flex justify-content-center">
+                <cardComponent :user="userFromLocalStorage" />
 
-                    <button @click="toggleQRCodeVisibility" class="boutton2">
-                        {{ showQRCode ? "Masquer QR Code" : "Afficher QR Code" }}
-                    </button>
-                </div>
+                <button @click="toggleQRCodeVisibility" class="boutton2">
+                    {{ showQRCode ? "Masquer QR Code" : "Afficher QR Code" }}
+                </button>
             </div>
-            <div class="col">
-                <div class="qrcode-large-section" v-if="showQRCode">
-                    <vue-qrcode :value="generateQRCodeValue" class="qrcode-large"></vue-qrcode>
-                </div>
+        </div>
+        <div class="col" v-if="showQRCode">
+            <div class="qrcode-large-section">
+                <vue-qrcode :value="generateQRCodeValue" class="qrcode-large"></vue-qrcode>
             </div>
         </div>
     </div>
@@ -56,12 +53,9 @@ export default {
 
 <style>
 /* Ajoutez des styles supplémentaires si nécessaire */
-.qrcode-large-section {
-    margin-left: 10px; /* Ajustez la marge à gauche pour l'espace entre la carte et le grand QR Code */
-}
 
 .qrcode-large {
-    width: 20em;
+    width: 15em;
 }
 
 /* Définition de la taille de la carte en fonction de la taille de l'écran */
