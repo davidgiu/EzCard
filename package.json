@@ -17,6 +17,7 @@
         "bootstrap-vue": "^2.23.1",
         "jquery": "^3.7.1",
         "jsqr": "^1.4.0",
+        "quagga": "^0.12.1",
         "vue": "^3.3.4",
         "vue-carousel": "^0.18.0",
         "vue-qrcode": "^2.2.0",

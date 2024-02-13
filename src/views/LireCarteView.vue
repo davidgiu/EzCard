@@ -27,20 +27,6 @@
     </div>
     <div class="col-6 mt-5">
         <div class="buttons-container d-flex flex-column align-items-center">
-            <div class="d-flex flex-column align-items-center">
-                <QrcodeStream
-                    v-if="cameraActive && !decodedUser && !capturing"
-                    @decode="onDecode"
-                    style="max-width: 80%"
-                />
-                <button
-                    class="btn btn-success small-button"
-                    v-if="cameraActive && !decodedUser && !capturing"
-                    @click="capturerPhoto"
-                >
-                    Capture Photo
-                </button>
-            </div>
             <input type="file" ref="fileInput" @change="handleFileChange" style="display: none" />
         </div>
     </div>
@@ -49,13 +35,12 @@
 </template>
 
 <script>
+import Quagga from "quagga";
 import jsQR from "jsqr";
-import { QrcodeStream } from "vue-qrcode-reader";
 import cardComponent from "@/components/cardComponent.vue";
 
 export default {
     components: {
-        QrcodeStream,
         cardComponent
     },
     data() {
@@ -74,10 +59,45 @@ export default {
             this.validationMessage = ""; // Réinitialiser le message de validation
         },
         demarrerCamera() {
-            this.cameraActive = !this.cameraActive;
+            this.cameraActive = true;
+            this.startQuagga();
         },
-        onDecode(value) {
-            this.decodedUser = JSON.parse(value);
+        startQuagga() {
+            const scannerOptions = {
+                inputStream: {
+                    type: "LiveStream",
+                    constraints: {
+                        width: 640,
+                        height: 480,
+                        facingMode: "environment"
+                    }
+                },
+                locator: {
+                    patchSize: "medium",
+                    halfSample: true
+                },
+                numOfWorkers: 4,
+                decoder: {
+                    readers: ["qrcode"]
+                },
+                locate: true
+            };
+
+            Quagga.init(scannerOptions, (err) => {
+                if (err) {
+                    console.error(err);
+                    this.erreurMessage = "Erreur lors de l'initialisation de QuaggaJS.";
+                    return;
+                }
+                Quagga.start();
+            });
+
+            Quagga.onDetected((data) => {
+                const code = data.codeResult.code;
+                this.decodedUser = JSON.parse(code);
+                this.erreurMessage = "";
+                Quagga.stop();
+            });
         },
         capturerPhoto() {
             if (this.cameraActive && !this.capturing) {
@@ -205,9 +225,6 @@ export default {
 </script>
 
 <style>
-
-
-
 .boutton3 {
     width: 100%;
     height: 150pt;
@@ -219,6 +236,7 @@ export default {
     font-size: 4rem;
     font-weight: bold;
 }
+
 @media (max-width: 767px) {
     .boutton3 {
         width: 300px;
