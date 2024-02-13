@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import QrcodeStream from "vue-qrcode-reader";
+import { QrcodeStream } from "vue-qrcode-reader";
 import jsQR from "jsqr";
 import cardComponent from "@/components/cardComponent.vue";
 
