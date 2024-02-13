@@ -99,43 +99,7 @@ export default {
                 Quagga.stop();
             });
         },
-        capturerPhoto() {
-            if (this.cameraActive && !this.capturing) {
-                this.capturing = true;
-                navigator.mediaDevices
-                    .getUserMedia({ video: true })
-                    .then((stream) => {
-                        const video = document.createElement("video");
-                        video.srcObject = stream;
-                        video.play();
-                        setTimeout(() => {
-                            const canvas = document.createElement("canvas");
-                            canvas.width = video.videoWidth;
-                            canvas.height = video.videoHeight;
-                            const context = canvas.getContext("2d");
-                            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                            const code = jsQR(imageData.data, imageData.width, imageData.height);
 
-                            if (code) {
-                                this.decodedUser = JSON.parse(code.data);
-                                this.erreurMessage = "";
-                            } else {
-                                console.error("Aucun QR code trouvé dans l'image.");
-                                this.erreurMessage = "Erreur : Aucun QR code trouvé dans l'image.";
-                            }
-
-                            stream.getTracks().forEach((track) => track.stop());
-                            this.capturing = false;
-                        }, 500);
-                    })
-                    .catch((error) => {
-                        console.error("Erreur lors de l'accès à la caméra :", error);
-                        this.erreurMessage = "Erreur lors de l'accès à la caméra.";
-                        this.capturing = false;
-                    });
-            }
-        },
         enregistrerCarte() {
             const cartesExistantes = JSON.parse(localStorage.getItem("cartes")) || [];
             cartesExistantes.push(this.decodedUser);
