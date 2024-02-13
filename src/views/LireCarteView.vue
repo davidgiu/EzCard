@@ -1,4 +1,7 @@
 <template>
+    <div>
+        <qrcode-stream @decode="onDecode"></qrcode-stream>
+    </div>
     <div v-if="!decodedUser" class="row mt-5">
         <div class="col-12 mb-4">
             <button class="boutton3" @click="readTag">NFC</button>
@@ -35,13 +38,14 @@
 </template>
 
 <script>
-import Quagga from "quagga";
+import QrcodeStream from "vue-qrcode-reader";
 import jsQR from "jsqr";
 import cardComponent from "@/components/cardComponent.vue";
 
 export default {
     components: {
-        cardComponent
+        cardComponent,
+        QrcodeStream
     },
     data() {
         return {
@@ -60,46 +64,20 @@ export default {
         },
         demarrerCamera() {
             this.cameraActive = true;
-            this.startQuagga();
+            navigator.mediaDevices
+                .getUserMedia({ video: true })
+                .then((stream) => {
+                    // L'utilisateur a autorisé l'accès à la caméra
+                })
+                .catch((err) => {
+                    console.log("Impossible d'accéder à la caméra:", err);
+                    this.erreurMessage = "Erreur : Impossible d'accéder à la caméra.";
+                });
         },
-        startQuagga() {
-            const scannerOptions = {
-                inputStream: {
-                    type: "LiveStream",
-                    constraints: {
-                        width: 640,
-                        height: 480,
-                        facingMode: "environment"
-                    }
-                },
-                locator: {
-                    patchSize: "medium",
-                    halfSample: true
-                },
-                numOfWorkers: 4,
-                decoder: {
-                    readers: ["qrcode"]
-                },
-                locate: true
-            };
-
-            Quagga.init(scannerOptions, (err) => {
-                if (err) {
-                    console.error(err);
-                    this.erreurMessage = "Erreur lors de l'initialisation de QuaggaJS.";
-                    return;
-                }
-                Quagga.start();
-            });
-
-            Quagga.onDetected((data) => {
-                const code = data.codeResult.code;
-                this.decodedUser = JSON.parse(code);
-                this.erreurMessage = "";
-                Quagga.stop();
-            });
+        onDecode(result) {
+            console.log("QR code decoded:", result);
+            // Utilisez le résultat du décodage ici
         },
-
         enregistrerCarte() {
             const cartesExistantes = JSON.parse(localStorage.getItem("cartes")) || [];
             cartesExistantes.push(this.decodedUser);
@@ -153,30 +131,6 @@ export default {
                             this.decodedUser = JSON.parse(decoder.decode(record.data)); // Mise à jour de la variable decodedUser
                         }
                     };
-                } catch (error) {
-                    console.error(error);
-                }
-            } else {
-                console.error("Web NFC is not supported.");
-            }
-        },
-
-        async writeTag() {
-            if ("NDEFReader" in window) {
-                const ndef = new NDEFReader();
-                try {
-                    const data = JSON.stringify({
-                        image: 1,
-                        nom: "giudice",
-                        prenom: "david",
-                        email: "david@gmail.com"
-                    });
-
-                    const encoder = new TextEncoder();
-                    const encodedData = encoder.encode(data);
-
-                    await ndef.write(encodedData);
-                    console.log("NDEF message written!");
                 } catch (error) {
                     console.error(error);
                 }
