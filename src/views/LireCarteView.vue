@@ -5,7 +5,7 @@
         </div>
         <div class="col-6 mb-4">
             <button class="boutton3" @click="demarrerCamera">Qr Code</button>
-            <QrcodeStream @decode="onDecode" style="max-width: 100%" />
+            <QrcodeStream v-if="cameraActive && !decodedUser && !capturing" @decode="onDecode" style="max-width: 80%" />
         </div>
         <div class="col-lg-6">
             <button class="boutton3" @click="importerQRCode">Fichiers</button>
