@@ -70,8 +70,8 @@ export default {
             erreurMessage: "",
             capturing: false,
             nfcDetected: false,
-            readingNFC: false
-            readingFailed: false;
+            readingNFC: false,
+            readingFailed: false
         };
     },
     methods: {
@@ -163,7 +163,7 @@ export default {
                 reader.readAsDataURL(file);
             }
         },
-        annuler(){
+        annuler() {
             this.readingFailed = true;
         },
         readNFC() {
