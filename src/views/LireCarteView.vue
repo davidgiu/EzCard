@@ -2,6 +2,10 @@
     <div v-if="!decodedUser && readingNFC" class="row d-flex justify-content-center">
         <h1 class="col-12">Lecture du nfc en cours...</h1>
         <span class="loader col-12"></span>
+        <div v-if="erreurMessage" class="alert alert-danger mt-5" role="alert">
+            {{ erreurMessage }}
+            <button @click="resetNFCDetection">Réessayer</button>
+        </div>
     </div>
     <div v-if="!decodedUser && !readingNFC" class="row mt-5">
         <div class="col-12 mb-4">
@@ -70,81 +74,79 @@ export default {
             erreurMessage: "",
             capturing: false,
             nfcDetected: false,
-            readingNFC: false
+            readingNFC: false,
+            nfcDetectionTimer: null,
+            nfcDetectionTimeout: 10000 // Temps limite en millisecondes (10 secondes)
         };
     },
     methods: {
-        annulerCarte() {
-            this.decodedUser = null; // Réinitialiser les données associées à la carte
-            this.validationMessage = ""; // Réinitialiser le message de validation
+        startNFCDetectionTimer() {
+            this.nfcDetectionTimer = setInterval(() => {
+                // Vérifier si le NFC n'a pas été détecté pendant le délai spécifié
+                if (!this.nfcDetected) {
+                    this.showErrorAndRetry(); // Afficher le message d'erreur et le bouton "Réessayer"
+                }
+            }, 1000); // Vérifier toutes les secondes
         },
-        demarrerCamera() {
-            this.cameraActive = !this.cameraActive;
+        // Méthode pour arrêter le minuteur de détection NFC
+        stopNFCDetectionTimer() {
+            clearInterval(this.nfcDetectionTimer);
         },
-        onDecode(value) {
-            this.decodedUser = JSON.parse(value);
+        // Méthode pour gérer l'affichage du message d'erreur et du bouton "Réessayer"
+        showErrorAndRetry() {
+            this.erreurMessage = "NFC non détecté. Veuillez réessayer.";
         },
-        capturerPhoto() {
-            if (this.cameraActive && !this.capturing) {
-                this.capturing = true;
-                navigator.mediaDevices
-                    .getUserMedia({ video: true })
-                    .then((stream) => {
-                        const video = document.createElement("video");
-                        video.srcObject = stream;
-                        video.play();
-                        setTimeout(() => {
-                            const canvas = document.createElement("canvas");
-                            canvas.width = video.videoWidth;
-                            canvas.height = video.videoHeight;
-                            const context = canvas.getContext("2d");
-                            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                            const code = jsQR(imageData.data, imageData.width, imageData.height);
-
-                            if (code) {
-                                this.decodedUser = JSON.parse(code.data);
-                                this.erreurMessage = "";
-                            } else {
-                                console.error("Aucun QR code trouvé dans l'image.");
-                                this.erreurMessage = "Erreur : Aucun QR code trouvé dans l'image.";
-                            }
-
-                            stream.getTracks().forEach((track) => track.stop());
-                            this.capturing = false;
-                        }, 500);
-                    })
-                    .catch((error) => {
-                        console.error("Erreur lors de l'accès à la caméra :", error);
-                        this.erreurMessage = "Erreur lors de l'accès à la caméra.";
-                        this.capturing = false;
-                    });
+        // Méthode pour réinitialiser le minuteur de détection NFC et cacher le message d'erreur
+        resetNFCDetection() {
+            this.stopNFCDetectionTimer();
+            this.startNFCDetectionTimer();
+            this.erreurMessage = ""; // Cacher le message d'erreur
+        }
+        // Autres méthodes...
+    },
+    watch: {
+        // Surveiller la détection NFC
+        nfcDetected(newVal) {
+            if (newVal) {
+                this.resetNFCDetection(); // Réinitialiser le minuteur si le NFC est détecté
             }
-        },
-        enregistrerCarte() {
-            const cartesExistantes = JSON.parse(localStorage.getItem("cartes")) || [];
-            cartesExistantes.push(this.decodedUser);
-            localStorage.setItem("cartes", JSON.stringify(cartesExistantes));
-            this.validationMessage = "Carte enregistrée avec succès.";
-            this.cameraActive = false;
-        },
-        importerQRCode() {
-            this.cameraActive = false;
-            this.$refs.fileInput.click();
-        },
-        handleFileChange(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const image = new Image();
-                    image.onload = () => {
+        }
+    },
+    created() {
+        // Démarrer le minuteur de détection NFC lorsque le composant est créé
+        this.startNFCDetectionTimer();
+    },
+    unmounted() {
+        // Arrêter le minuteur de détection NFC lorsque le composant est détruit pour éviter les fuites de mémoire
+        this.stopNFCDetectionTimer();
+    },
+    annulerCarte() {
+        this.decodedUser = null; // Réinitialiser les données associées à la carte
+        this.validationMessage = ""; // Réinitialiser le message de validation
+        this.readingNFC = false;
+    },
+    demarrerCamera() {
+        this.cameraActive = !this.cameraActive;
+    },
+    onDecode(value) {
+        this.decodedUser = JSON.parse(value);
+    },
+    capturerPhoto() {
+        if (this.cameraActive && !this.capturing) {
+            this.capturing = true;
+            navigator.mediaDevices
+                .getUserMedia({ video: true })
+                .then((stream) => {
+                    const video = document.createElement("video");
+                    video.srcObject = stream;
+                    video.play();
+                    setTimeout(() => {
                         const canvas = document.createElement("canvas");
-                        const ctx = canvas.getContext("2d");
-                        canvas.width = image.width;
-                        canvas.height = image.height;
-                        ctx.drawImage(image, 0, 0, image.width, image.height);
-                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        const context = canvas.getContext("2d");
+                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
                         const code = jsQR(imageData.data, imageData.width, imageData.height);
 
                         if (code) {
@@ -154,35 +156,87 @@ export default {
                             console.error("Aucun QR code trouvé dans l'image.");
                             this.erreurMessage = "Erreur : Aucun QR code trouvé dans l'image.";
                         }
-                    };
-                    image.src = reader.result;
+
+                        stream.getTracks().forEach((track) => track.stop());
+                        this.capturing = false;
+                    }, 500);
+                })
+                .catch((error) => {
+                    console.error("Erreur lors de l'accès à la caméra :", error);
+                    this.erreurMessage = "Erreur lors de l'accès à la caméra.";
+                    this.capturing = false;
+                });
+        }
+    },
+    enregistrerCarte() {
+        const cartesExistantes = JSON.parse(localStorage.getItem("cartes")) || [];
+        cartesExistantes.push(this.decodedUser);
+        localStorage.setItem("cartes", JSON.stringify(cartesExistantes));
+        this.validationMessage = "Carte enregistrée avec succès.";
+        this.cameraActive = false;
+        this.readingNFC = false;
+    },
+    importerQRCode() {
+        this.cameraActive = false;
+        this.$refs.fileInput.click();
+    },
+    handleFileChange(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const image = new Image();
+                image.onload = () => {
+                    const canvas = document.createElement("canvas");
+                    const ctx = canvas.getContext("2d");
+                    canvas.width = image.width;
+                    canvas.height = image.height;
+                    ctx.drawImage(image, 0, 0, image.width, image.height);
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+                    if (code) {
+                        this.decodedUser = JSON.parse(code.data);
+                        this.erreurMessage = "";
+                    } else {
+                        console.error("Aucun QR code trouvé dans l'image.");
+                        this.erreurMessage = "Erreur : Aucun QR code trouvé dans l'image.";
+                    }
                 };
-                reader.readAsDataURL(file);
+                image.src = reader.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    },
+    async readTag() {
+        if ("NDEFReader" in window) {
+            const ndef = new NDEFReader();
+            try {
+                await ndef.scan();
+                this.readingNFC = true;
+                ndef.onreading = (event) => {
+                    const decoder = new TextDecoder();
+                    for (const record of event.message.records) {
+                        console.log("Record type:  " + record.recordType);
+                        console.log("MIME type:    " + record.mediaType);
+                        console.log("=== data ===\n" + decoder.decode(record.data));
+                        this.decodedUser = JSON.parse(decoder.decode(record.data)); // Mise à jour de la variable decodedUser
+                    }
+                    // Mettre à jour la variable de détection NFC
+                    this.nfcDetected = true;
+                };
+            } catch (error) {
+                console.error(error);
+                this.erreurMessage = "Erreur lors de la lecture du NFC.";
+                this.nfcDetected = false; // Mettre à jour la variable de détection NFC en cas d'erreur
             }
-        },
-        async readTag() {
-            if ("NDEFReader" in window) {
-                const ndef = new NDEFReader();
-                try {
-                    await ndef.scan();
-                    this.readingNFC = true;
-                    ndef.onreading = (event) => {
-                        const decoder = new TextDecoder();
-                        for (const record of event.message.records) {
-                            console.log("Record type:  " + record.recordType);
-                            console.log("MIME type:    " + record.mediaType);
-                            console.log("=== data ===\n" + decoder.decode(record.data));
-                            this.decodedUser = JSON.parse(decoder.decode(record.data)); // Mise à jour de la variable decodedUser
-                        }
-                    };
-                } catch (error) {
-                    console.error(error);
-                }
-            } else {
-                console.error("Web NFC is not supported.");
-            }
+        } else {
+            console.error("Web NFC is not supported.");
+            this.erreurMessage = "Web NFC n'est pas pris en charge.";
+            this.nfcDetected = false; // Mettre à jour la variable de détection NFC en cas de non prise en charge
         }
     }
+    // Autres méthodes existantes
 };
 </script>
 
