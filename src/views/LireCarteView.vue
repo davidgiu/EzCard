@@ -167,8 +167,9 @@ export default {
             this.readingFailed = true;
         },
         readNFC() {
-            this.readTag();
             this.readingNFC = true;
+            this.readTag();
+
             setTimeout(() => {
                 if (!this.decodedUser) {
                     this.erreurMessage = "Aucune carte NFC détectée.";
