@@ -1,53 +1,62 @@
 <template>
-    <div>
-        <div v-if="cameraActive">
-            <qrcode-stream @decode="onDecode"></qrcode-stream>
+    <div v-if="!decodedUser" class="row mt-5">
+        <div class="col-12 mb-4">
+            <button class="boutton3" @click="readTag">NFC</button>
         </div>
-        <div v-if="!decodedUser" class="row mt-5">
-            <div class="col-12 mb-4">
-                <button class="boutton3" @click="readTag">NFC</button>
-            </div>
-            <div class="col-6 mb-4"><button class="boutton3" @click="demarrerCamera">Qr Code</button></div>
-            <div class="col-lg-6">
-                <button class="boutton3" @click="importerQRCode">Fichiers</button>
-            </div>
+        <div class="col-6 mb-4"><button class="boutton3" @click="demarrerCamera">Qr Code</button></div>
+        <div class="col-lg-6">
+            <button class="boutton3" @click="importerQRCode">Fichiers</button>
         </div>
-        <div v-if="decodedUser" class="row mt-5">
-            <div class="col-6" v-if="!validationMessage">
-                <button class="boutton3" @click="enregistrerCarte">Enregistrer la Carte</button>
-            </div>
-            <div class="col-12" v-if="validationMessage">
-                <button class="boutton3" @click="annulerCarte">Lire un nouvelle carte</button>
-            </div>
-            <div class="col" v-if="!validationMessage">
-                <button class="boutton3" @click="annulerCarte">Annuler</button>
-            </div>
-            <div class="col-12">
-                <div v-if="validationMessage" class="alert alert-success mt-3" role="alert">
-                    {{ validationMessage }}
-                </div>
-            </div>
-            <div class="col-12 mt-5"><cardComponent :user="decodedUser" /></div>
-        </div>
-        <div class="col-6 mt-5">
-            <div class="buttons-container d-flex flex-column align-items-center">
-                <input type="file" ref="fileInput" @change="handleFileChange" style="display: none" />
-            </div>
-        </div>
-
-        <div v-if="erreurMessage" class="alert alert-danger mt-5" role="alert">{{ erreurMessage }}</div>
     </div>
+    <div v-if="decodedUser" class="row mt-5">
+        <div class="col-6" v-if="!validationMessage">
+            <button class="boutton3" @click="enregistrerCarte">Enregistrer la Carte</button>
+        </div>
+        <div class="col-12" v-if="validationMessage">
+            <button class="boutton3" @click="annulerCarte">Lire un nouvelle carte</button>
+        </div>
+        <div class="col" v-if="!validationMessage">
+            <button class="boutton3" @click="annulerCarte">Annuler</button>
+        </div>
+        <div class="col-12">
+            <div v-if="validationMessage" class="alert alert-success mt-3" role="alert">
+                {{ validationMessage }}
+            </div>
+        </div>
+        <div class="col-12 mt-5"><cardComponent :user="decodedUser" /></div>
+    </div>
+    <div class="col-6 mt-5">
+        <div class="buttons-container d-flex flex-column align-items-center">
+            <div class="d-flex flex-column align-items-center">
+                <QrcodeStream
+                    v-if="cameraActive && !decodedUser && !capturing"
+                    @decode="onDecode"
+                    style="max-width: 80%"
+                />
+                <button
+                    class="btn btn-success small-button"
+                    v-if="cameraActive && !decodedUser && !capturing"
+                    @click="capturerPhoto"
+                >
+                    Capture Photo
+                </button>
+            </div>
+            <input type="file" ref="fileInput" @change="handleFileChange" style="display: none" />
+        </div>
+    </div>
+
+    <div v-if="erreurMessage" class="alert alert-danger mt-5" role="alert">{{ erreurMessage }}</div>
 </template>
 
 <script>
-import { QrcodeStream } from "vue-qrcode-reader";
 import jsQR from "jsqr";
+import { QrcodeStream } from "vue-qrcode-reader";
 import cardComponent from "@/components/cardComponent.vue";
 
 export default {
     components: {
-        cardComponent,
-        QrcodeStream
+        QrcodeStream,
+        cardComponent
     },
     data() {
         return {
@@ -65,17 +74,46 @@ export default {
             this.validationMessage = ""; // Réinitialiser le message de validation
         },
         demarrerCamera() {
-            this.cameraActive = true;
+            this.cameraActive = !this.cameraActive;
         },
-        onDecode(result) {
-            if (result && result.length > 0) {
-                this.decodedUser = result[0].codeData;
-                console.log("QR code decoded:", this.decodedUser);
-                // Utilisez le résultat du décodage ici
-                this.enregistrerCarte(); // Traitement automatique du résultat décodé
-            } else {
-                console.error("Aucun QR code détecté.");
-                this.erreurMessage = "Erreur : Aucun QR code détecté.";
+        onDecode(value) {
+            this.decodedUser = JSON.parse(value);
+        },
+        capturerPhoto() {
+            if (this.cameraActive && !this.capturing) {
+                this.capturing = true;
+                navigator.mediaDevices
+                    .getUserMedia({ video: true })
+                    .then((stream) => {
+                        const video = document.createElement("video");
+                        video.srcObject = stream;
+                        video.play();
+                        setTimeout(() => {
+                            const canvas = document.createElement("canvas");
+                            canvas.width = video.videoWidth;
+                            canvas.height = video.videoHeight;
+                            const context = canvas.getContext("2d");
+                            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                            const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+                            if (code) {
+                                this.decodedUser = JSON.parse(code.data);
+                                this.erreurMessage = "";
+                            } else {
+                                console.error("Aucun QR code trouvé dans l'image.");
+                                this.erreurMessage = "Erreur : Aucun QR code trouvé dans l'image.";
+                            }
+
+                            stream.getTracks().forEach((track) => track.stop());
+                            this.capturing = false;
+                        }, 500);
+                    })
+                    .catch((error) => {
+                        console.error("Erreur lors de l'accès à la caméra :", error);
+                        this.erreurMessage = "Erreur lors de l'accès à la caméra.";
+                        this.capturing = false;
+                    });
             }
         },
         enregistrerCarte() {
@@ -107,7 +145,6 @@ export default {
                         if (code) {
                             this.decodedUser = JSON.parse(code.data);
                             this.erreurMessage = "";
-                            this.enregistrerCarte(); // Traitement automatique du résultat décodé
                         } else {
                             console.error("Aucun QR code trouvé dans l'image.");
                             this.erreurMessage = "Erreur : Aucun QR code trouvé dans l'image.";
@@ -130,9 +167,32 @@ export default {
                             console.log("MIME type:    " + record.mediaType);
                             console.log("=== data ===\n" + decoder.decode(record.data));
                             this.decodedUser = JSON.parse(decoder.decode(record.data)); // Mise à jour de la variable decodedUser
-                            this.enregistrerCarte(); // Traitement automatique du résultat décodé
                         }
                     };
+                } catch (error) {
+                    console.error(error);
+                }
+            } else {
+                console.error("Web NFC is not supported.");
+            }
+        },
+
+        async writeTag() {
+            if ("NDEFReader" in window) {
+                const ndef = new NDEFReader();
+                try {
+                    const data = JSON.stringify({
+                        image: 1,
+                        nom: "giudice",
+                        prenom: "david",
+                        email: "david@gmail.com"
+                    });
+
+                    const encoder = new TextEncoder();
+                    const encodedData = encoder.encode(data);
+
+                    await ndef.write(encodedData);
+                    console.log("NDEF message written!");
                 } catch (error) {
                     console.error(error);
                 }
@@ -145,6 +205,9 @@ export default {
 </script>
 
 <style>
+
+
+
 .boutton3 {
     width: 100%;
     height: 150pt;
@@ -156,7 +219,6 @@ export default {
     font-size: 4rem;
     font-weight: bold;
 }
-
 @media (max-width: 767px) {
     .boutton3 {
         width: 300px;
