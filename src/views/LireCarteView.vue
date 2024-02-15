@@ -5,7 +5,11 @@
         </div>
         <div class="col-6 mb-4">
             <button class="boutton3" @click="captureQRCode">Scanner un QR Code</button>
-            <QrcodeStream v-if="cameraActive && !decodedUser && !capturing" @decode="onDecode" style="max-width: 80%" />
+            <QrcodeStream
+                v-if="cameraActive && !decodedUser && !capturing"
+                @decode="onDecode(value)"
+                style="max-width: 80%"
+            />
         </div>
         <div class="col-lg-6">
             <button class="boutton3" @click="importQRCodeFromFile">Importer depuis un fichier</button>
