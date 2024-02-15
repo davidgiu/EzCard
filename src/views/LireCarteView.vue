@@ -1,43 +1,37 @@
 <template>
-    <div class="row mt-5">
+    <div v-if="!decodedUser" class="row mt-5">
         <div class="col-12 mb-4">
-            <button class="boutton3" @click="toggleCamera">Activer/Désactiver la caméra</button>
+            <button class="boutton3" @click="readTag">NFC</button>
         </div>
         <div class="col-6 mb-4">
-            <button class="boutton3" @click="captureQRCode">Scanner un QR Code</button>
-            <QrcodeStream
-                v-if="cameraActive && !decodedUser && !capturing"
-                @decode="onDecode(value)"
-                style="max-width: 80%"
-            />
+            <button class="boutton3" @click="demarrerCamera">Qr Code</button>
+            <QrcodeStream @decode="onDecode" style="max-width: 100%" />
         </div>
         <div class="col-lg-6">
-            <button class="boutton3" @click="importQRCodeFromFile">Importer depuis un fichier</button>
+            <button class="boutton3" @click="importerQRCode">Fichiers</button>
         </div>
     </div>
     <div v-if="decodedUser" class="row mt-5">
         <div class="col-6" v-if="!validationMessage">
-            <button class="boutton3" @click="saveCard">Enregistrer la carte</button>
+            <button class="boutton3" @click="enregistrerCarte">Enregistrer la Carte</button>
         </div>
-        <div class="col-12" v-else>
-            <button class="boutton3" @click="resetCard">Lire une nouvelle carte</button>
+        <div class="col-12" v-if="validationMessage">
+            <button class="boutton3" @click="annulerCarte">Lire un nouvelle carte</button>
         </div>
         <div class="col" v-if="!validationMessage">
-            <button class="boutton3" @click="cancelCard">Annuler</button>
+            <button class="boutton3" @click="annulerCarte">Annuler</button>
         </div>
         <div class="col-12">
             <div v-if="validationMessage" class="alert alert-success mt-3" role="alert">
                 {{ validationMessage }}
             </div>
         </div>
-        <div class="col-12 mt-5">
-            <cardComponent :user="decodedUser" />
-        </div>
+        <div class="col-12 mt-5"><cardComponent :user="decodedUser" /></div>
     </div>
 
     <input type="file" ref="fileInput" @change="handleFileChange" style="display: none" />
 
-    <div v-if="errorMessage" class="alert alert-danger mt-5" role="alert">{{ errorMessage }}</div>
+    <div v-if="erreurMessage" class="alert alert-danger mt-5" role="alert">{{ erreurMessage }}</div>
 </template>
 
 <script>
@@ -55,47 +49,33 @@ export default {
             decodedUser: null,
             cameraActive: false,
             validationMessage: "",
-            errorMessage: "",
-            capturing: false
+            erreurMessage: "",
+            capturing: false,
+            nfcDetected: false
         };
     },
     methods: {
-        toggleCamera() {
+        annulerCarte() {
+            this.decodedUser = null; // Réinitialiser les données associées à la carte
+            this.validationMessage = ""; // Réinitialiser le message de validation
+        },
+        demarrerCamera() {
             this.cameraActive = !this.cameraActive;
+            console.log("cameraActive", this.cameraActive);
         },
         onDecode(value) {
-            try {
-                this.decodedUser = JSON.parse(value);
-                this.errorMessage = "";
-            } catch (error) {
-                console.error("Error parsing decoded data:", error);
-                this.errorMessage = "Erreur : Données décodées invalides.";
-            }
+            console.log("decoded", value);
+            this.decodedUser = JSON.parse(value);
         },
-        saveCard() {
-            try {
-                const existingCards = JSON.parse(localStorage.getItem("cards")) || [];
-                existingCards.push(this.decodedUser);
-                localStorage.setItem("cards", JSON.stringify(existingCards));
-                this.validationMessage = "Carte enregistrée avec succès.";
-                this.cameraActive = false;
-            } catch (error) {
-                console.error("Error saving card:", error);
-                this.errorMessage = "Erreur : Impossible d'enregistrer la carte.";
-            }
+
+        enregistrerCarte() {
+            const cartesExistantes = JSON.parse(localStorage.getItem("cartes")) || [];
+            cartesExistantes.push(this.decodedUser);
+            localStorage.setItem("cartes", JSON.stringify(cartesExistantes));
+            this.validationMessage = "Carte enregistrée avec succès.";
+            this.cameraActive = false;
         },
-        resetCard() {
-            this.decodedUser = null;
-            this.validationMessage = "";
-        },
-        cancelCard() {
-            this.decodedUser = null;
-            this.validationMessage = "";
-        },
-        captureQRCode() {
-            this.capturing = true;
-        },
-        importQRCodeFromFile() {
+        importerQRCode() {
             this.cameraActive = false;
             this.$refs.fileInput.click();
         },
@@ -113,16 +93,63 @@ export default {
                         ctx.drawImage(image, 0, 0, image.width, image.height);
                         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                         const code = jsQR(imageData.data, imageData.width, imageData.height);
+
                         if (code) {
-                            this.onDecode(code.data);
+                            this.decodedUser = JSON.parse(code.data);
+                            this.erreurMessage = "";
                         } else {
-                            console.error("No QR code found in the image.");
-                            this.errorMessage = "Erreur : Aucun QR code trouvé dans l'image.";
+                            console.error("Aucun QR code trouvé dans l'image.");
+                            this.erreurMessage = "Erreur : Aucun QR code trouvé dans l'image.";
                         }
                     };
                     image.src = reader.result;
                 };
                 reader.readAsDataURL(file);
+            }
+        },
+        async readTag() {
+            if ("NDEFReader" in window) {
+                const ndef = new NDEFReader();
+                try {
+                    await ndef.scan();
+                    ndef.onreading = (event) => {
+                        const decoder = new TextDecoder();
+                        for (const record of event.message.records) {
+                            console.log("Record type:  " + record.recordType);
+                            console.log("MIME type:    " + record.mediaType);
+                            console.log("=== data ===\n" + decoder.decode(record.data));
+                            this.decodedUser = JSON.parse(decoder.decode(record.data)); // Mise à jour de la variable decodedUser
+                        }
+                    };
+                } catch (error) {
+                    console.error(error);
+                }
+            } else {
+                console.error("Web NFC is not supported.");
+            }
+        },
+
+        async writeTag() {
+            if ("NDEFReader" in window) {
+                const ndef = new NDEFReader();
+                try {
+                    const data = JSON.stringify({
+                        image: 1,
+                        nom: "giudice",
+                        prenom: "david",
+                        email: "david@gmail.com"
+                    });
+
+                    const encoder = new TextEncoder();
+                    const encodedData = encoder.encode(data);
+
+                    await ndef.write(encodedData);
+                    console.log("NDEF message written!");
+                } catch (error) {
+                    console.error(error);
+                }
+            } else {
+                console.error("Web NFC is not supported.");
             }
         }
     }
