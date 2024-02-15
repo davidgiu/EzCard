@@ -1,40 +1,42 @@
 <template>
-    <div v-if="cameraActive">
-        <qrcode-stream @decode="onDecode"></qrcode-stream>
-    </div>
-    <div v-if="!decodedUser" class="row mt-5">
-        <div class="col-12 mb-4">
-            <button class="boutton3" @click="readTag">NFC</button>
+    <div>
+        <div v-if="cameraActive">
+            <qrcode-stream @decode="onDecode"></qrcode-stream>
         </div>
-        <div class="col-6 mb-4"><button class="boutton3" @click="demarrerCamera">Qr Code</button></div>
-        <div class="col-lg-6">
-            <button class="boutton3" @click="importerQRCode">Fichiers</button>
-        </div>
-    </div>
-    <div v-if="decodedUser" class="row mt-5">
-        <div class="col-6" v-if="!validationMessage">
-            <button class="boutton3" @click="enregistrerCarte">Enregistrer la Carte</button>
-        </div>
-        <div class="col-12" v-if="validationMessage">
-            <button class="boutton3" @click="annulerCarte">Lire un nouvelle carte</button>
-        </div>
-        <div class="col" v-if="!validationMessage">
-            <button class="boutton3" @click="annulerCarte">Annuler</button>
-        </div>
-        <div class="col-12">
-            <div v-if="validationMessage" class="alert alert-success mt-3" role="alert">
-                {{ validationMessage }}
+        <div v-if="!decodedUser" class="row mt-5">
+            <div class="col-12 mb-4">
+                <button class="boutton3" @click="readTag">NFC</button>
+            </div>
+            <div class="col-6 mb-4"><button class="boutton3" @click="demarrerCamera">Qr Code</button></div>
+            <div class="col-lg-6">
+                <button class="boutton3" @click="importerQRCode">Fichiers</button>
             </div>
         </div>
-        <div class="col-12 mt-5"><cardComponent :user="decodedUser" /></div>
-    </div>
-    <div class="col-6 mt-5">
-        <div class="buttons-container d-flex flex-column align-items-center">
-            <input type="file" ref="fileInput" @change="handleFileChange" style="display: none" />
+        <div v-if="decodedUser" class="row mt-5">
+            <div class="col-6" v-if="!validationMessage">
+                <button class="boutton3" @click="enregistrerCarte">Enregistrer la Carte</button>
+            </div>
+            <div class="col-12" v-if="validationMessage">
+                <button class="boutton3" @click="annulerCarte">Lire un nouvelle carte</button>
+            </div>
+            <div class="col" v-if="!validationMessage">
+                <button class="boutton3" @click="annulerCarte">Annuler</button>
+            </div>
+            <div class="col-12">
+                <div v-if="validationMessage" class="alert alert-success mt-3" role="alert">
+                    {{ validationMessage }}
+                </div>
+            </div>
+            <div class="col-12 mt-5"><cardComponent :user="decodedUser" /></div>
         </div>
-    </div>
+        <div class="col-6 mt-5">
+            <div class="buttons-container d-flex flex-column align-items-center">
+                <input type="file" ref="fileInput" @change="handleFileChange" style="display: none" />
+            </div>
+        </div>
 
-    <div v-if="erreurMessage" class="alert alert-danger mt-5" role="alert">{{ erreurMessage }}</div>
+        <div v-if="erreurMessage" class="alert alert-danger mt-5" role="alert">{{ erreurMessage }}</div>
+    </div>
 </template>
 
 <script>
@@ -64,21 +66,13 @@ export default {
         },
         demarrerCamera() {
             this.cameraActive = true;
-            navigator.mediaDevices
-                .getUserMedia({ video: true })
-                .then((stream) => {
-                    // L'utilisateur a autorisé l'accès à la caméra
-                })
-                .catch((err) => {
-                    console.log("Impossible d'accéder à la caméra:", err);
-                    this.erreurMessage = "Erreur : Impossible d'accéder à la caméra.";
-                });
         },
         onDecode(result) {
             if (result && result.length > 0) {
                 this.decodedUser = result[0].codeData;
                 console.log("QR code decoded:", this.decodedUser);
                 // Utilisez le résultat du décodage ici
+                this.enregistrerCarte(); // Traitement automatique du résultat décodé
             } else {
                 console.error("Aucun QR code détecté.");
                 this.erreurMessage = "Erreur : Aucun QR code détecté.";
@@ -113,6 +107,7 @@ export default {
                         if (code) {
                             this.decodedUser = JSON.parse(code.data);
                             this.erreurMessage = "";
+                            this.enregistrerCarte(); // Traitement automatique du résultat décodé
                         } else {
                             console.error("Aucun QR code trouvé dans l'image.");
                             this.erreurMessage = "Erreur : Aucun QR code trouvé dans l'image.";
@@ -135,6 +130,7 @@ export default {
                             console.log("MIME type:    " + record.mediaType);
                             console.log("=== data ===\n" + decoder.decode(record.data));
                             this.decodedUser = JSON.parse(decoder.decode(record.data)); // Mise à jour de la variable decodedUser
+                            this.enregistrerCarte(); // Traitement automatique du résultat décodé
                         }
                     };
                 } catch (error) {
