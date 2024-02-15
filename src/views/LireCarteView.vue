@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="cameraActive">
         <qrcode-stream @decode="onDecode"></qrcode-stream>
     </div>
     <div v-if="!decodedUser" class="row mt-5">
@@ -75,8 +75,14 @@ export default {
                 });
         },
         onDecode(result) {
-            console.log("QR code decoded:", result);
-            // Utilisez le résultat du décodage ici
+            if (result && result.length > 0) {
+                this.decodedUser = result[0].codeData;
+                console.log("QR code decoded:", this.decodedUser);
+                // Utilisez le résultat du décodage ici
+            } else {
+                console.error("Aucun QR code détecté.");
+                this.erreurMessage = "Erreur : Aucun QR code détecté.";
+            }
         },
         enregistrerCarte() {
             const cartesExistantes = JSON.parse(localStorage.getItem("cartes")) || [];
