@@ -5,7 +5,7 @@
     </div>
     <div v-if="!decodedUser && !readingNFC" class="row mt-5">
         <div class="col-12 mb-4">
-            <button class="boutton3" @click="readTag">NFC</button>
+            <button class="boutton3" @click="readNFC">NFC</button>
         </div>
         <div class="col-6 mb-4"><button class="boutton3" @click="demarrerCamera">Qr Code</button></div>
         <div class="col-lg-6">
