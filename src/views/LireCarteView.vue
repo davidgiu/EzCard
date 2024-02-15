@@ -1,6 +1,7 @@
 <template>
-    <div v-if="readingNFC">
-        <span class="loader"></span>
+    <div v-if="!decodedUser && readingNFC" class="row d-flex justify-content-center">
+        <h1 class="col-12">Lecture du nfc en cours...</h1>
+        <span class="loader col-12"></span>
     </div>
     <div v-if="!decodedUser && !readingNFC" class="row mt-5">
         <div class="col-12 mb-4">
@@ -187,8 +188,8 @@ export default {
 
 <style>
 .loader {
-    width: 48px;
-    height: 48px;
+    width: 10em;
+    height: 10em;
     border-radius: 50%;
     display: inline-block;
     border-top: 3px solid #fff;
@@ -196,7 +197,10 @@ export default {
     box-sizing: border-box;
     animation: rotation 1s linear infinite;
 }
-
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
 @keyframes rotation {
     0% {
         transform: rotate(0deg);
