@@ -1,75 +1,54 @@
 <template>
-    <div>
-        <!-- Boutons NFC, QR Code et Fichiers -->
-        <div v-if="!decodedUser" class="row mt-5">
-            <div class="col-12 mb-4">
-                <button class="boutton3" @click="startNFCWriting">NFC</button>
-            </div>
-            <div class="col-6 mb-4"><button class="boutton3" @click="demarrerCamera">Qr Code</button></div>
-            <div class="col-lg-6">
-                <button class="boutton3" @click="importerQRCode">Fichiers</button>
-            </div>
+    <div v-if="readingNFC">
+        <span class="loader"></span>
+    </div>
+    <div v-if="!decodedUser && !readingNFC" class="row mt-5">
+        <div class="col-12 mb-4">
+            <button class="boutton3" @click="readTag">NFC</button>
         </div>
-
-        <!-- Zone de chargement et bouton réessayer pour NFC -->
-        <div v-if="nfcWritingInProgress" class="col-6 mt-5">
-            <p>Ecriture du NFC en cours...</p>
-            <span class="loader"></span>
-            <button class="btn btn-danger" @click="cancelNFCWriting">Annuler</button>
-        </div>
-
-        <!-- Messages d'erreur -->
-        <div v-if="erreurMessage" class="alert alert-danger mt-5" role="alert">
-            {{ erreurMessage }}
-            <button
-                class="btn btn-primary"
-                @click="retryNFCWriting"
-                v-if="erreurMessage === 'Echec de l\'écriture NFC. Réessayez?'"
-            >
-                Réessayer
-            </button>
-        </div>
-
-        <!-- Contenu lorsqu'un utilisateur est décodé -->
-        <div v-if="decodedUser" class="row mt-5">
-            <div class="col-6" v-if="!validationMessage">
-                <button class="boutton3" @click="enregistrerCarte">Enregistrer la Carte</button>
-            </div>
-            <div class="col-12" v-if="validationMessage">
-                <button class="boutton3" @click="annulerCarte">Lire un nouvelle carte</button>
-            </div>
-            <div class="col" v-if="!validationMessage">
-                <button class="boutton3" @click="annulerCarte">Annuler</button>
-            </div>
-            <div class="col-12">
-                <div v-if="validationMessage" class="alert alert-success mt-3" role="alert">
-                    {{ validationMessage }}
-                </div>
-            </div>
-            <div class="col-12 mt-5"><cardComponent :user="decodedUser" /></div>
-        </div>
-
-        <!-- Zone de caméra et de chargement QR Code -->
-        <div class="col-6 mt-5">
-            <div class="buttons-container d-flex flex-column align-items-center">
-                <div class="d-flex flex-column align-items-center">
-                    <QrcodeStream
-                        v-if="cameraActive && !decodedUser && !capturing"
-                        @decode="onDecode"
-                        style="max-width: 80%"
-                    />
-                    <button
-                        class="btn btn-success small-button"
-                        v-if="cameraActive && !decodedUser && !capturing"
-                        @click="capturerPhoto"
-                    >
-                        Capture Photo
-                    </button>
-                </div>
-                <input type="file" ref="fileInput" @change="handleFileChange" style="display: none" />
-            </div>
+        <div class="col-6 mb-4"><button class="boutton3" @click="demarrerCamera">Qr Code</button></div>
+        <div class="col-lg-6">
+            <button class="boutton3" @click="importerQRCode">Fichiers</button>
         </div>
     </div>
+    <div v-if="decodedUser" class="row mt-5">
+        <div class="col-6" v-if="!validationMessage">
+            <button class="boutton3" @click="enregistrerCarte">Enregistrer la Carte</button>
+        </div>
+        <div class="col-12" v-if="validationMessage">
+            <button class="boutton3" @click="annulerCarte">Lire un nouvelle carte</button>
+        </div>
+        <div class="col" v-if="!validationMessage">
+            <button class="boutton3" @click="annulerCarte">Annuler</button>
+        </div>
+        <div class="col-12">
+            <div v-if="validationMessage" class="alert alert-success mt-3" role="alert">
+                {{ validationMessage }}
+            </div>
+        </div>
+        <div class="col-12 mt-5"><cardComponent :user="decodedUser" /></div>
+    </div>
+    <div class="col-6 mt-5">
+        <div class="buttons-container d-flex flex-column align-items-center">
+            <div class="d-flex flex-column align-items-center">
+                <QrcodeStream
+                    v-if="cameraActive && !decodedUser && !capturing"
+                    @decode="onDecode"
+                    style="max-width: 80%"
+                />
+                <button
+                    class="btn btn-success small-button"
+                    v-if="cameraActive && !decodedUser && !capturing"
+                    @click="capturerPhoto"
+                >
+                    Capture Photo
+                </button>
+            </div>
+            <input type="file" ref="fileInput" @change="handleFileChange" style="display: none" />
+        </div>
+    </div>
+
+    <div v-if="erreurMessage" class="alert alert-danger mt-5" role="alert">{{ erreurMessage }}</div>
 </template>
 
 <script>
@@ -90,7 +69,7 @@ export default {
             erreurMessage: "",
             capturing: false,
             nfcDetected: false,
-            nfcWritingInProgress: false
+            readingNFC: false
         };
     },
     methods: {
@@ -180,69 +159,52 @@ export default {
                 reader.readAsDataURL(file);
             }
         },
-        async startNFCWriting() {
+        async readTag() {
             if ("NDEFReader" in window) {
-                this.nfcWritingInProgress = true;
-                this.erreurMessage = ""; // Réinitialiser le message d'erreur
-
+                const ndef = new NDEFReader();
                 try {
-                    await this.writeTag();
-
-                    // Écriture réussie, réinitialiser l'état
-                    this.nfcWritingInProgress = false;
-                    console.log("NFC écrit avec succès!");
-                } catch (error) {
-                    console.error("Erreur lors de l'écriture NFC :", error);
-
-                    // Afficher un message d'erreur
-                    this.erreurMessage = "Echec de l'écriture NFC. Réessayez?";
-                    setTimeout(() => {
-                        this.nfcWritingInProgress = false;
-                        if (this.erreurMessage === "Echec de l'écriture NFC. Réessayez?") {
-                            this.erreurMessage = ""; // Effacer le message après un certain temps
+                    await ndef.scan();
+                    this.readingNFC = true;
+                    ndef.onreading = (event) => {
+                        const decoder = new TextDecoder();
+                        for (const record of event.message.records) {
+                            console.log("Record type:  " + record.recordType);
+                            console.log("MIME type:    " + record.mediaType);
+                            console.log("=== data ===\n" + decoder.decode(record.data));
+                            this.decodedUser = JSON.parse(decoder.decode(record.data)); // Mise à jour de la variable decodedUser
                         }
-                    }, 10000); // 10 secondes
+                    };
+                } catch (error) {
+                    console.error(error);
                 }
             } else {
                 console.error("Web NFC is not supported.");
             }
-        },
-        async writeTag() {
-            if ("NDEFReader" in window) {
-                const ndef = new NDEFReader();
-                try {
-                    const data = JSON.stringify({
-                        image: 1,
-                        nom: "giudice",
-                        prenom: "david",
-                        email: "david@gmail.com"
-                    });
-
-                    const encoder = new TextEncoder();
-                    const encodedData = encoder.encode(data);
-
-                    await ndef.write(encodedData);
-                    console.log("NDEF message written!");
-                } catch (error) {
-                    console.error(error);
-                    throw new Error("Erreur lors de l'écriture NFC.");
-                }
-            } else {
-                throw new Error("Web NFC is not supported.");
-            }
-        },
-        cancelNFCWriting() {
-            this.nfcWritingInProgress = false;
-            this.erreurMessage = ""; // Effacer le message d'erreur
-        },
-        retryNFCWriting() {
-            this.startNFCWriting();
-        },
+        }
     }
 };
 </script>
 
 <style>
+.loader {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: inline-block;
+    border-top: 3px solid #fff;
+    border-right: 3px solid transparent;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
 .boutton3 {
     width: 100%;
     height: 150pt;
