@@ -170,9 +170,6 @@ export default {
                 reader.readAsDataURL(file);
             }
         },
-        annuler() {
-            this.readingFailed = true;
-        },
         readNFC() {
             this.readingNFC = true;
             this.readTag();
@@ -180,7 +177,7 @@ export default {
             setTimeout(() => {
                 if (!this.decodedUser) {
                     this.erreurMessage = "Aucune carte NFC détectée.";
-                    this.annuler();
+                    this.readingFailed = true;
                 }
             }, 20000);
         },
