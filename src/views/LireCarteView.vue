@@ -1,5 +1,10 @@
 <template>
-    <div v-if="!decodedUser && readingNFC" class="row d-flex justify-content-center">
+    <div v-if="readingFailed">
+        <div class="col">
+            <button class="boutton3" @click="annulerCarte">Ré-essayer</button>
+        </div>
+    </div>
+    <div v-if="!decodedUser && readingNFC && !readingFailed" class="row d-flex justify-content-center">
         <h1 class="col-12">Lecture du nfc en cours...</h1>
         <span class="loader col-12"></span>
     </div>
@@ -79,6 +84,8 @@ export default {
             this.decodedUser = null; // Réinitialiser les données associées à la carte
             this.validationMessage = ""; // Réinitialiser le message de validation
             this.readingNFC = false;
+            this.erreurMessage = "";
+            this.readingFailed = false;
         },
         demarrerCamera() {
             this.cameraActive = !this.cameraActive;
@@ -175,7 +182,7 @@ export default {
                     this.erreurMessage = "Aucune carte NFC détectée.";
                     this.annuler();
                 }
-            }, 10000);
+            }, 20000);
         },
         async readTag() {
             if ("NDEFReader" in window) {
